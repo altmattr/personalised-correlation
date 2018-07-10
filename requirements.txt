@@ -1,0 +1,11 @@
+certifi==2018.4.16
+click==6.7
+Flask==0.10.1
+gunicorn==19.4.5
+itsdangerous==0.24
+Jinja2==2.10
+MarkupSafe==1.0
+pipenv==2018.7.1
+virtualenv==16.0.0
+virtualenv-clone==0.3.0
+Werkzeug==0.14.1

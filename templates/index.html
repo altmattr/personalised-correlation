@@ -1,0 +1,70 @@
+<html>
+   <head>
+   <script src="https://unpkg.com/3d-force-graph@1.35.4/dist/3d-force-graph.min.js"></script>
+   <script src="/static/app.js" charset="utf-8"></script>
+   </head>
+   <body>
+       <h1>test</h1>
+       
+
+       <!-- temp work of tam </!-->
+        
+
+        <div id="3d-graph"></div>
+
+  <script>
+	var dataMatrix = [
+		[0, 1, 2, 3, 4, 5],
+		[1, 1, 2, 3, 4, 5],
+		[2, 1, 2, 3, 4, 5],
+		[3, 1, 2, 3, 4, 5],
+		[4, 1, 2, 3, 4, 5],
+		[5, 1, 2, 3, 4, 5],
+	];
+	///*
+	function createNodes(dataRow){
+		var nodes = [];
+		for (var i = 1; i < dataRow.length; i++)
+		{
+			nodes.push({id:dataRow[i]});
+		}
+		return nodes;
+	}
+	var nodes = createNodes(dataMatrix[0]);
+	console.log(nodes);
+	
+	function createLinks(dataMatrix){
+		var links = [];
+		for (var i = 1; i < dataMatrix.length; i++){
+			for (var j = i+1; j < dataMatrix.length; j++){
+				if (dataMatrix[i][j] > 0){
+					links.push({source: dataMatrix[i][0], target: dataMatrix[0][j]});
+				}
+			}
+		}
+		return links;
+	}
+	
+	var dataLinks = createLinks(dataMatrix);
+	
+	console.log(dataLinks);
+	
+	const gData = {
+		nodes: nodes,
+		links: dataLinks
+	}
+
+    const Graph = ForceGraph3D()
+      (document.getElementById('3d-graph'))
+        .graphData(gData);
+  </script>
+
+
+
+
+
+
+
+
+   </body>   
+</html>
