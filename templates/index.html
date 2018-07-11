@@ -11,7 +11,7 @@
         
 
         <div id="3d-graph"></div>
-  <script>
+	<script>
 	var data = {{ data|safe }}
 	console.log(Object.values(data));
 	var dataMatrix = data;
@@ -53,8 +53,8 @@
 		"rgb(0,0,128,1)",
 	]
 	
-    const Graph = ForceGraph3D();
-    Graph(document.getElementById('3d-graph'))
+	const Graph = ForceGraph3D();
+	Graph(document.getElementById('3d-graph'))
 		.nodeColor(function(node){
 			let severity = symptomValues[node.index][2];
 			return severityChart[severity];
@@ -68,14 +68,6 @@
 		})
 		.backgroundColor("white")
 		.graphData(gData);
-  </script>
-
-
-
-
-
-
-
-
-   </body>   
+	</script>
+	</body>   
 </html>
