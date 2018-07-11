@@ -4,18 +4,14 @@
    <script src="/static/app.js" charset="utf-8"></script>
    </head>
    <body>
-       <h1>test</h1>
-       
-
-       <!-- temp work of tam </!-->
-        
-
-        <div id="3d-graph"></div>
+		<div id="3d-graph"></div>
   <script>
+	// Receive csv data from the python app, and convert to an array
 	var data = {{ data|safe }}
 	console.log(Object.values(data));
-	var dataMatrix = data;
-	///*
+	var dataMatrix = Object.values(data);
+	
+	// 
 	function createNodes(dataRow){
 		var nodes = [];
 		for (var i = 1; i < dataRow.length; i++)
@@ -52,13 +48,6 @@
       (document.getElementById('3d-graph'))
         .graphData(gData);
   </script>
-
-
-
-
-
-
-
 
    </body>   
 </html>

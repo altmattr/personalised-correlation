@@ -5,11 +5,7 @@ app = Flask(__name__)
 
 data = []
 
-if( not os.path.isfile('corr-matrix.csv') ):
-    print("Can't find file.")
-    exit()
-
-with open('corr-matrix.csv', 'rt', encoding="utf-8") as csvfile:
+with open('corr-matrix.csv', 'rt') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
     for row in spamreader:
         data.append(row)
