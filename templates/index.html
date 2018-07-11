@@ -15,42 +15,59 @@
 	var data = {{ data|safe }}
 	console.log(Object.values(data));
 	var dataMatrix = data;
-	///*
-	function createNodes(dataRow){
+	
+	function createNodes(dataCol){
 		var nodes = [];
-		for (var i = 1; i < dataRow.length; i++)
-		{
-			nodes.push({id:dataRow[i]});
+		for (var i = 0; i < dataCol.length; i++){
+			nodes.push({id:dataCol[i][0], index: i, colour: "green"});
 		}
 		return nodes;
 	}
-	var nodes = createNodes(dataMatrix[0]);
-	console.log(nodes);
 	
 	function createLinks(dataMatrix){
 		var links = [];
 		for (var i = 1; i < dataMatrix.length; i++){
 			for (var j = i+1; j < dataMatrix.length; j++){
-				if (dataMatrix[i][j] > 0){
-					links.push({source: dataMatrix[i][0], target: dataMatrix[0][j]});
-				}
+				if (dataMatrix[i][j] > 0)
+					links.push({source: dataMatrix[i][0], target: dataMatrix[0][j], width: 1, color: "green"});
 			}
 		}
 		return links;
 	}
-	
+
+	var nodes = createNodes(symptomValues);
+
 	var dataLinks = createLinks(dataMatrix);
 	
-	console.log(dataLinks);
+	let highlightNodes = [];
 	
 	const gData = {
 		nodes: nodes,
-		links: dataLinks
+		links: dataLinks,
 	}
-
-    const Graph = ForceGraph3D()
-      (document.getElementById('3d-graph'))
-        .graphData(gData);
+	
+	let severityChart = [
+		"rgb(176, 224, 230,1)",
+		"rgb(0 , 206, 209,1)",
+		"rgb(95, 158, 160,1)",
+		"rgb(0,0,128,1)",
+	]
+	
+    const Graph = ForceGraph3D();
+    Graph(document.getElementById('3d-graph'))
+		.nodeColor(function(node){
+			let severity = symptomValues[node.index][2];
+			return severityChart[severity];
+		})
+		.nodeVal(function(node, link){
+			return symptomValues[node.index][1];
+		})
+		.linkWidth('width')
+		.linkColor(function(link){
+			return link.color;
+		})
+		.backgroundColor("white")
+		.graphData(gData);
   </script>
 
 
