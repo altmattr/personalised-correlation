@@ -1,8 +1,13 @@
 from flask import Flask, render_template
 import csv
+import os.path
 app = Flask(__name__) 
 
 data = []
+
+if( not os.path.isfile('corr-matrix.csv') ):
+    print("Can't find file.")
+    exit()
 
 with open('corr-matrix.csv', 'rt', encoding=utf8) as csvfile:
     spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
