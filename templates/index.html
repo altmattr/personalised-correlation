@@ -7,9 +7,10 @@
 		<div id="3d-graph"></div>
   <script>
 	// Receive csv data from the python app, and convert to an array
-	var data = {{ data|safe }}
+	var data = {{ data|safe }};
 	console.log(Object.values(data));
 	var dataMatrix = Object.values(data);
+	var symptomValues = {{ symptomData|safe }};
 	
 	// 
 	function createNodes(dataCol){
