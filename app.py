@@ -5,7 +5,7 @@ app = Flask(__name__)
 data = []
 
 with open('corr-matrix.csv', 'rb') as csvfile:
-    spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+    spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
     for row in spamreader:
         data.append(row)
 
