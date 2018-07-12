@@ -3,7 +3,7 @@ import zipfile
 import json
 import io
 
-def get_all_results(apiToken='CAd56GmSu02n04L1INwMYGOdaDzJXktCXiSGnUFJ', surveyId='SV_265U095GB7t1r0x', fileFormat='csv', dataCenter='mqedu'):
+def get_all_results(apiToken='CAd56GmSu02n04L1INwMYGOdaDzJXktCXiSGnUFJ', surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv', dataCenter='mqedu'):
 
     # Setting static parameters
     requestCheckProgress = 0

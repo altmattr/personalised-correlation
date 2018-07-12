@@ -37,20 +37,12 @@ def get_survey_data():
     # make a call to the qualtrics API to update the user data files
     get_all_results(apiToken='CAd56GmSu02n04L1INwMYGOdaDzJXktCXiSGnUFJ', surveyId='SV_2i51uu8Vidq2zC5')
 
-    # get the value of userID query string (i.e. ?userID=some-value)
-    userID = request.args.get('userID')
+    # get the value of userID query string (i.e. ?response_id=some-value)
+    response_id = request.args.get('response_id')
 
-    # run data.py to update data based on new information
-    dataProcessing.main(userID)
+    symptom_data = dataProcessing.main(response_id)
 
-    # get all the survey response data
-    individual_responses = []
-    with open ('data/freq.csv', 'rt') as responsescsv:
-        reader = csv.reader(responsescsv, delimiter=',', quotechar='|')
-        for row in reader:
-            individual_responses.append(row)
-
-    return 'OK'
+    return render_template("index.html", data=data, symptomData=symptom_data)
 
 
 if __name__ == '__main__':
