@@ -1,4 +1,3 @@
-
 # coding: utf-8
 import pandas as pd
 import csv
@@ -43,14 +42,16 @@ def create_freq_stats_per_value(data):
 	df.to_csv('data/freq.csv')
 
 
-def create_freq_stats_per_avg(data):
+def create_freq_stats_per_avg(data, ind_response):
 	"""
 	Q1|2.9
 	Q2|2.5
 	Q3|2.2
 	"""
-	i_response = data.iloc[-1].fillna(0)
-	questions = {}
+
+	# number for normalising scores to between 1 and normal_range
+	normal_range = 4
+	questions = []
 	for col in data.columns:
 	    # score, count for this col
 	    values = data[col].value_counts()
@@ -63,19 +64,29 @@ def create_freq_stats_per_avg(data):
 	    for k,v in values.items():
 	        total+= v
 	        count+=int(k)*v
-	    # add average response for question, and individual response for that question
-	    questions[col] = ['%.2f' % (count/total), int(i_response[col])]
+	    # add average response for question
 
-	ser = pd.Series(*questions.values())
-	ser.to_csv('data/freq.csv', header=True)
+
+	    curr_response = ind_response[col]
+
+	    val = int(ind_response[col])
+	    max_val = int(data[col].max())
+
+	    ind_normalised = int((val/ max_val) * normal_range + -0.5) + 1
+
+	    row = [col, '%.2f' % (count/total), ind_normalised]
+	    questions.append(row)
+
+	ser = pd.DataFrame(questions, columns = ['Question','Average','Individual'])
+	ser.to_csv('data/freq.csv', header=True, index=None)
 
 			
 			
-def main(create_stats=False, verbose=True):
+def main(response_id, create_stats=True, verbose=True):
 	if verbose: print('begun main processing')
 
 	# read in data, most resource intensive operation
-	data = pd.read_csv('data/qualtrics.csv')
+	data = pd.read_csv('data/qualtrics.csv', index_col='ResponseId')
 	# only get test values
 	data = data[data.DistributionChannel == 'test']
 	# drop null columns and non-question columns
@@ -87,11 +98,20 @@ def main(create_stats=False, verbose=True):
 	data = data[[col for col in data.columns if col.startswith("Q")]]
 
 	if verbose: print('trimmed csv loaded')
-	
+
+	# cast values to int
+	data = data.astype(float)
+
 	# create frequency statistics
 	if create_stats:
 		# CHANGE THIS to create_freq_stats_per_value if needed
-		create_freq_stats_per_avg(data)
+
+		try:
+			ind_response = data.loc[response_id].fillna(0)
+		except KeyError:
+			print('response id not found')
+			
+		create_freq_stats_per_avg(data, ind_response)
 
 		if verbose: print('freq stats created.')
 
@@ -99,8 +119,6 @@ def main(create_stats=False, verbose=True):
 	#data.fillna(0,inplace=True)
 
 
-	# cast values to int
-	data = data.astype(float)
 	
 	# create corr corr-matrix 
 	data_corr = data.corr()
@@ -131,7 +149,7 @@ if __name__ == '__main__':
 	import time
 	start = time.time()
 
-	main()
+	main('R_b437z8esnOET9yd')
 
 	end = time.time()
 	print('main() process took ',end - start, ' seconds to execute.')

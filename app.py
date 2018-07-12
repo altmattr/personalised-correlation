@@ -37,29 +37,18 @@ def get_survey_data():
     # make a call to the qualtrics API to update the user data files
     get_all_results(apiToken='CAd56GmSu02n04L1INwMYGOdaDzJXktCXiSGnUFJ', surveyId='SV_2i51uu8Vidq2zC5')
 
-    # run data.py to update data based on new information
-    dataProcessing.main()
-
     # get the value of userID query string (i.e. ?userID=some-value)
     userID = request.args.get('userID')
 
+    # run data.py to update data based on new information
+    dataProcessing.main(userID)
+
     # get all the survey response data
-    survey_responses = []
-    with open ('data/DSM MQ Data Survey 1.2.csv', 'rt') as responsescsv:
+    individual_responses = []
+    with open ('data/freq.csv', 'rt') as responsescsv:
         reader = csv.reader(responsescsv, delimiter=',', quotechar='|')
         for row in reader:
-            survey_responses.append(row)
-
-    # find the individual response data based on query string
-    i = len(survey_responses)-1
-    id_index = -1
-    while i >= 0:
-        # find the respondent's row
-        if survey_responses[i][0] == userID:
-            id_index = i
-            print(survey_responses[i])
-            # get results
-        i -= 1
+            individual_responses.append(row)
 
     return 'OK'
 
