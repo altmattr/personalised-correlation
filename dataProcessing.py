@@ -1,3 +1,4 @@
+
 # coding: utf-8
 import pandas as pd
 import csv
@@ -73,15 +74,17 @@ def create_freq_stats_per_avg(data, ind_response):
 	    max_val = int(data[col].max())
 
 	    ind_normalised = int((val/ max_val) * normal_range + -0.5) + 1
-
-	    row = [col, '%.2f' % (count/total), ind_normalised]
+	    # ignore this hacky float
+	    row = [col, float('%.2f' % (count/total)), ind_normalised]
 	    questions.append(row)
 
-	ser = pd.DataFrame(questions, columns = ['Question','Average','Individual'])
-	ser.to_csv('data/freq.csv', header=True, index=None)
 
-			
-			
+	return questions
+	#ser = pd.DataFrame(questions, columns = ['Question','Average','Individual'])
+	#ser.to_csv('data/freq.csv', header=True, index=None)
+
+
+
 def main(response_id, create_stats=True, verbose=True):
 	if verbose: print('begun main processing')
 
@@ -110,8 +113,8 @@ def main(response_id, create_stats=True, verbose=True):
 			ind_response = data.loc[response_id].fillna(0)
 		except KeyError:
 			print('response id not found')
-			
-		create_freq_stats_per_avg(data, ind_response)
+
+		freq_data = create_freq_stats_per_avg(data, ind_response)
 
 		if verbose: print('freq stats created.')
 
@@ -144,6 +147,9 @@ def main(response_id, create_stats=True, verbose=True):
 	data_corr.to_csv('data/corr-matrix.csv')
 	scaled_corr.to_csv('data/scaled-corr-matrix.csv')
 	if verbose: print('saved corr-matrix')
+
+
+	return freq_data
 
 if __name__ == '__main__':
 	import time
