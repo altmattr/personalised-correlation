@@ -7,12 +7,12 @@ data = []
 
 symptomData = []
 
-with open('corr-matrix.csv', 'rt') as csvfile:
+with open('data/corr-matrix.csv', 'rt') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
     for row in spamreader:
         data.append(row)
 
-with open('freq.csv', 'rt') as freqfile:
+with open('data/freq.csv', 'rt') as freqfile:
     filereader = csv.reader(freqfile, delimiter=',',  quotechar='|')
     for row in filereader:
         symptomData.append(row)
