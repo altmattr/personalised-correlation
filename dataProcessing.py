@@ -2,6 +2,7 @@
 # coding: utf-8
 import pandas as pd
 import csv
+import re
 
 def create_freq_stats_total(data):
 	"""
@@ -109,7 +110,6 @@ def create_freq_stats_per_avg(data, response_id, create_csv=False, verbose=False
 	    row = [col, scaled_avg, ind_normalised]
 	    # load row into questions list
 	    questions.append(row)
-	#print(*questions,sep='\n')
 
 	return questions
 
@@ -119,22 +119,46 @@ def main(response_id, create_stats=True, verbose=True):
 	if verbose: print('begun main processing')
 
 	# read in data, most resource intensive operation
-	data = pd.read_csv('data/qualtrics.csv', index_col='ResponseId')
-	# only get test values
-	data = data[data.DistributionChannel == 'test']
-	# drop null columns and non-question columns
-	drop_cols = [col for col, val in data.isnull().sum().items() if val > 5000]
-	# drop questions with invalid data
-	drop_cols.extend(['Q31','Q32'])
+	data = pd.read_csv('data/qualtrics.csv')
+
+	# find response_id regardless of string format
+	pattern = re.compile('(?i)response ?_?id') # case insensitive, 'responseid', with '_',' ' or '' separating the words.
+	for col in data.columns:
+	    match = re.search(pattern,col)
+	    if match:
+	        response_id_colname = match.group(0)
+	        break
+
+	data.set_index(response_id_colname, inplace=True)
+
+	if verbose: print(response_id_colname, 'column found.')
+
+	# drop first 2 rows to remove irrelevant data
+	data = data.iloc[2:]
+
+	# keep question columns
+	keep_cols = [col for col in data.columns if col.lower().startswith('q')]
+	data = data[keep_cols]
+
+	# drop columns if 90% of it's values are null
+	drop_cols = [col for col, val in data.isnull().sum().items() if val > int(data.shape[0]*0.9)]
+
+	# remove any column that cannot be converted into a float
+	for col in data.columns:
+	    try:
+	        # check first value in column to see if it can be cast to float object
+	        float(data[col].iloc[0])
+	    except ValueError:
+	        # if not, then we don't want it. (likely a string)
+	        drop_cols.append(col)
+
 	data.drop(drop_cols, axis=1,inplace=True)
 
-	data = data[[col for col in data.columns if col.startswith("Q")]]
-
-	if verbose: print('trimmed csv loaded')
 
 	# cast values to int
 	data = data.astype(float)
 
+	if verbose: print('DataFrame has been cleaned')
 	# create frequency statistics
 	if create_stats:
 		# CHANGE THIS to create_freq_stats_per_value if needed
@@ -147,9 +171,10 @@ def main(response_id, create_stats=True, verbose=True):
 
 
 	
-	# create corr corr-matrix 
+	# create pearson corr-matrix 
 	data_corr = data.corr()
 
+	data_corr = data_corr.fillna(1)
 	# replacing negative correlations with  (not needed)
 	#data_corr[data_corr < 0] = 0
 
@@ -165,7 +190,6 @@ def main(response_id, create_stats=True, verbose=True):
 	# turn into integer representation
 	scaled_corr = scaled_corr.round(1)*10
 	scaled_corr.astype(int, inplace=True)
-
 
 	# save corr matrix
 	data_corr.to_csv('data/corr-matrix.csv')
@@ -183,6 +207,5 @@ if __name__ == '__main__':
 	invalid = 'bad_id'
 	res = main(valid)
 	print(*res, sep='\n')
-
 	end = time.time()
 	print('main() process took ',end - start, ' seconds to execute.')
