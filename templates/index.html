@@ -6,81 +6,90 @@
   <div id="3d-graph"></div>
   <script>
 
-  // Receive csv data from the python app
-  var dataMatrix = {{ data|safe }}; // correlation
-  var symptomRatings = {{ symptomData|safe }}; // averages freq.csv
+	// Receive csv data from the python app
+	var dataMatrix = {{ data|safe }}; // correlation
+	var symptomRatings = {{ symptomData|safe }}; // averages freq.csv
   
+		//Config Data:
+	//Color of nodes, index as rating
 	var severityChart = 
 	[
-		"rgb(183, 232, 255, 1)",
 		"rgb(183, 232, 255, 1)",
 		"rgb(98, 181, 219, 1)",
 		"rgb(29, 134, 183, 1)",
 		"rgb(8, 61, 135, 1)",
 	]
 
-	var nodeSizeModifier = 0.7;
-	var maxNodeSize = 3;
-	var minNodeSize = 1;
-
-	var linkWidthModifier = 0.3;
+	var nodeSizeModifier = 0.9;
+	var maxNodeSize = 5;
+	var minNodeSize = 0.5;
+	//Determines what links will be displayed 
+	//i.e anything less than -linkThreshold and anything greater than linkThreshold
 	var linkThreshold = 5;
+	var linkWidthModifier = 0.3;
 	var maxLinkWidth = 8;
 	var minLinkWidth = 0.1;
-
+	var posCorrLinkColor = "green";
+	var negCorrLinkColor = "red";
+	
+	var nodeResolution = 20;
+	var labelTextColor = "black";
+	var backgroundColor = "white";
+	//End of Config 
 	// Node
-	function createNodes(dataCol){
+	function createNodes(dataMatrix, symptomRatings){
 		var nodes = [];
-		for (var i = 1; i < dataCol.length; i++){
-      // Define node color
-      var colorIdx = symptomRatings[i][2];
-      var nodeRadius = symptomRatings[i][1];
+		for (var i = 1; i < dataMatrix.length; i++){
+			symptIdx = i-1;
+			var colorIdx = symptomRatings[symptIdx][2];
+			var nodeRadius = symptomRatings[symptIdx][1];
 			nodeRadius *= nodeSizeModifier;
-			nodes.push({id:dataCol[i][0], index: i, color:severityChart[colorIdx], radius:nodeRadius, symptom:symptomRatings[i-1][0]});
+			nodeRadius = Math.max(Math.min(nodeRadius, maxNodeSize), minNodeSize);
+			//Node in the form: 
+			//nodes.push({id:node ID make sure this is the same as linked, index: idx or id of node by unique number 0 - (max node-1), color: colour of node, 
+			//radius: size of node, symptom: name of symptom)
+			nodes.push({id:dataMatrix[0][i], index: i, color:severityChart[colorIdx], radius:nodeRadius, symptom:symptomRatings[symptIdx][0]});
 		}
 		return nodes;
 	}
-	console.log(dataMatrix);
+	
+	
+	
 	function createLinks(dataMatrix){
 		var links = [];
 		for (var i = 1; i < dataMatrix.length; i++){
 			for (var j = i+1; j < dataMatrix.length; j++){
-				//console.log("Parrot");
 				var corrData = +dataMatrix[i][j];
-				var linkColor = "green";
+				//Links in the form: 
+				//source: which node to link from, target: which node to link to, 
+				//width: size of link, color: colour of link, isReverse: true if is negative correlation else false}}
 				if (corrData > linkThreshold){
 					corrData *= linkWidthModifier;
-					links.push({source: dataMatrix[i][0], target: dataMatrix[0][j], width: corrData, color: linkColor, isReverse: false});
+					corrData = Math.max(Math.min(corrData, maxLinkWidth), minLinkWidth);
+					links.push({source: dataMatrix[i][0], target: dataMatrix[0][j], width: corrData, color: posCorrLinkColor, isReverse: false});
 				}
 				else if (corrData < -linkThreshold){
 					corrData *= linkWidthModifier;
 					corrData *= -1;
-					links.push({source: dataMatrix[i][0], target: dataMatrix[0][j], width: corrData-1, color: "red", isReverse: true});
+					corrData = Math.max(Math.min(corrData, maxLinkWidth), minLinkWidth);
+					links.push({source: dataMatrix[i][0], target: dataMatrix[0][j], width: corrData-1, color: posCorrLinkColor, isReverse: true});
 				}
 			}
 		}
 		return links;
 	}
 	
-	////console.log("Nodes Good");
-	
-	var nodes = createNodes(dataMatrix);
-	////console.log(nodes);
-	
+	//Calls Create Node to generate array of node objects.
+	console.log(symptomRatings);
+	var nodes = createNodes(dataMatrix, symptomRatings);
+	//Calls CreateLinks to generate array of Link objects.
 	var dataLinks = createLinks(dataMatrix);
-	setTimeout(function()
-	{
-		////console.log("Data Links");
-		////console.log(dataLinks);
-	}, 500);
-	
+
 	const gData = {
 		nodes: nodes,
 		links: dataLinks,
 	}
 	
-	////console.log("G Data");
-	////console.log(gData);+
 	const elem = document.getElementById('3d-graph');
 	
     const Graph = ForceGraph3D();
@@ -89,27 +98,15 @@
 		.nodeVal('radius')
 		.linkWidth('width')
 		.linkColor('color')
-		.backgroundColor("white")
-		.nodeResolution(20)
-		/*.linkDirectionalParticles(function(link){
-			if (link.isReverse == true)
-				return 2;
-			return 0;
-		})
-		.linkDirectionalParticleWidth(function(link){
-			if (link.isReverse == true)
-			{
-				console.log(link.width);
-				return link.width *20;
-			}
-			return 0;
-		})
-		.linkDirectionalParticleResolution(20)*/
+		.backgroundColor(backgroundColor)
+		//Resolution 20 looks good, 0 looks like rectangles
+		.nodeResolution(nodeResolution)
+		//Opacity is set between 0 and 1 where 0 is transparent and 1 is opaque
 		.linkOpacity(0.3)
 		.nodeOpacity(1)
+		//Displays the text when hovering a node.
 		.nodeLabel(function(node){
-			var label = "<p style="+'"'+"color:black"+'"'+">" + node.symptom + "</p>";
-			console.log(label);
+			var label = "<p style="+'"'+"color:"+ labelTextColor +'"'+">" + node.symptom + "</p>";
 			return label;
 		})
 		.graphData(gData);
