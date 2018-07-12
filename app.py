@@ -14,6 +14,11 @@ def correlation_data_to_list():
     return data
 
 
+@app.route('/')
+def index():
+    return 'hello'
+
+
 @app.route('/data')
 def get_survey_data():
     #TODO: crash gracefully
