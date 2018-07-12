@@ -13,24 +13,6 @@ def correlation_data_to_list():
             data.append(row)
     return data
 
-def freq_data_to_list():
-    symptom_data = []
-
-    with open('data/freq.csv', 'rt') as freqfile:
-        filereader = csv.reader(freqfile, delimiter=',',  quotechar='|')
-        for row in filereader:
-            symptom_data.append(row)
-    
-    return symptom_data
-
-
-# route for index
-@app.route('/')
-def hello():
-    data = correlation_data_to_list()
-    symptom_data = freq_data_to_list()
-    return render_template("index.html", data=data, symptomData=symptom_data)
-
 
 @app.route('/data')
 def get_survey_data():
@@ -39,6 +21,8 @@ def get_survey_data():
 
     # get the value of userID query string (i.e. ?response_id=some-value)
     response_id = request.args.get('response_id')
+
+    data = correlation_data_to_list()
 
     symptom_data = dataProcessing.main(response_id)
 

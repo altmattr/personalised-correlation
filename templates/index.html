@@ -20,7 +20,7 @@
 		"rgb(8, 61, 135, 1)",
 	]
 
-	var nodeSizeModifier = 0.9;
+	var nodeSizeModifier = 2;
 	var maxNodeSize = 5;
 	var minNodeSize = 0.5;
 	//Determines what links will be displayed 
@@ -41,9 +41,9 @@
 		var nodes = [];
 		for (var i = 1; i < dataMatrix.length; i++){
 			symptIdx = i-1;
-			var colorIdx = symptomRatings[symptIdx][2];
+			var colorIdx = symptomRatings[symptIdx][2]-1;
 			var nodeRadius = symptomRatings[symptIdx][1];
-			nodeRadius *= nodeSizeModifier;
+			nodeRadius *= nodeRadius;
 			nodeRadius = Math.max(Math.min(nodeRadius, maxNodeSize), minNodeSize);
 			//Node in the form: 
 			//nodes.push({id:node ID make sure this is the same as linked, index: idx or id of node by unique number 0 - (max node-1), color: colour of node, 
@@ -72,7 +72,7 @@
 					corrData *= linkWidthModifier;
 					corrData *= -1;
 					corrData = Math.max(Math.min(corrData, maxLinkWidth), minLinkWidth);
-					links.push({source: dataMatrix[i][0], target: dataMatrix[0][j], width: corrData-1, color: posCorrLinkColor, isReverse: true});
+					links.push({source: dataMatrix[i][0], target: dataMatrix[0][j], width: corrData-1, color: negCorrLinkColor, isReverse: true});
 				}
 			}
 		}
@@ -106,7 +106,7 @@
 		.nodeOpacity(1)
 		//Displays the text when hovering a node.
 		.nodeLabel(function(node){
-			var label = "<p style="+'"'+"color:"+ labelTextColor +'"'+">" + node.symptom + "</p>";
+			var label = "<p style="+'"'+"color:"+ labelTextColor +'; background-color:#fafafa"'+">" + node.symptom + "</p>";
 			return label;
 		})
 		.graphData(gData);
