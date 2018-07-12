@@ -30,7 +30,6 @@ def get_survey_data():
 
     return render_template("index.html", data=data, symptomData=symptom_data)
 
-
 if __name__ == '__main__':
     app.run()
 
