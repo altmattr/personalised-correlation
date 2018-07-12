@@ -43,12 +43,24 @@ def create_freq_stats_per_value(data):
 	df.to_csv('data/freq.csv')
 
 
-def create_freq_stats_per_avg(data, ind_response):
+def create_freq_stats_per_avg(data, response_id, verbose=False):
 	"""
 	Q1|2.9
 	Q2|2.5
-	Q3|2.2
+	Q3|3.7
+	response_id: cases
+		found: Series object
+		not found: dict populated with 0s
+
+	keep that in mind if you try to access the ind_response object in a diffrent way
+
 	"""
+
+	try:
+		ind_response = data.loc[response_id].fillna(0)
+	except KeyError:
+		if verbose: print('response id not found')
+		ind_response = {col:0 for col in data.columns}
 
 	# number for normalising scores to between 1 and normal_range
 	normal_range = 4
@@ -108,13 +120,7 @@ def main(response_id, create_stats=True, verbose=True):
 	# create frequency statistics
 	if create_stats:
 		# CHANGE THIS to create_freq_stats_per_value if needed
-
-		try:
-			ind_response = data.loc[response_id].fillna(0)
-		except KeyError:
-			print('response id not found')
-
-		freq_data = create_freq_stats_per_avg(data, ind_response)
+		freq_data = create_freq_stats_per_avg(data, response_id, verbose=verbose)
 
 		if verbose: print('freq stats created.')
 
@@ -152,10 +158,13 @@ def main(response_id, create_stats=True, verbose=True):
 	return freq_data
 
 if __name__ == '__main__':
+	# run 'python dataProcessing.py' for testing
 	import time
 	start = time.time()
-
-	main('R_b437z8esnOET9yd')
+	valid = 'R_b437z8esnOET9yd'
+	invalid = 'bad_id'
+	res = main(invalid)
+	print(*res, sep='\n')
 
 	end = time.time()
 	print('main() process took ',end - start, ' seconds to execute.')
