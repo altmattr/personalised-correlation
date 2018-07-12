@@ -7,65 +7,113 @@
   <script>
 
   // Receive csv data from the python app
-  var dataMatrix = {{ data|safe }};
-  var symptomValues = {{ symptomData|safe }};
+  var dataMatrix = {{ data|safe }}; // correlation
+  var symptomRatings = {{ symptomData|safe }}; // averages freq.csv
+  
+	var severityChart = 
+	[
+		"rgb(176, 224, 230,1)",
+		"rgb(0 , 206, 209,1)",
+		"rgb(95, 158, 160,1)",
+		"rgb(0,0,128,1)",
+	]
 
-  // Create nodes for symptomValues == freq.csv
-  function createNodes(dataCol){
-    var nodes = [];
-    for (var i = 0; i < dataCol.length; i++){
-      // Creates one node for each question and makes the node id the question number.
-      nodes.push({id:dataCol[i][0], index: i, colour: "green"});
-    }
-    return nodes;
-  }
+	var nodeSizeModifier = 0.5;
+	var maxNodeSize = 2;
+	var minNodeSize = 1;
 
-  function createLinks(dataMatrix){
-    var links = [];
-    for (var i = 1; i < dataMatrix.length; i++){
-      for (var j = i+1; j < dataMatrix.length; j++){
-        if (dataMatrix[i][j] > 0)
-        // TODO need to change width based on strength of correlation
-        links.push({source: dataMatrix[i][0], target: dataMatrix[0][j], width: 1, color: "green"});
-      }
-    }
-    return links;
-  }
+	var linkWidthModifier = 0.2;
+	var linkThreshold = 5;
+	var maxLinkWidth = 5;
+	var minLinkWidth = 1;
 
-  var nodes = createNodes(symptomValues);
-
-  var dataLinks = createLinks(dataMatrix);
-
-  let highlightNodes = [];
-
-  const gData = {
-    nodes: nodes,
-    links: dataLinks,
-  }
-
-  let severityChart = [
-    "rgb(8, 61, 135, 0.5)",
-    "rgb(8, 61, 135, 0.5)",
-    "rgb(8, 61, 135, 0.5)",
-    "rgb(8, 61, 135, 0.5)"
-  ]
-
-  const Graph = ForceGraph3D();
-  Graph(document.getElementById('3d-graph'))
-  .nodeColor(function(node){
-    let severity = symptomValues[node.index][2];
-    return severityChart[0];
-  })
-  .nodeVal(function(node, link){
-    return symptomValues[node.index][1];
-  })
-  .linkWidth('width')
-  .linkColor(function(link){
-    return link.color;
-  })
-  .backgroundColor("white")
-  .graphData(gData);
-
+	//Node
+	function createNodes(dataCol){
+		var nodes = [];
+		for (var i = 0; i < dataCol.length; i++){
+      //Define node color
+      //var colorIdx = symptomRatings[i][2];
+      var colorIdx = 1;
+      var nodeRadius = symptomRatings[i][1];
+			nodeRadius *= nodeSizeModifier;
+			nodes.push({id:dataCol[i][0], index: i, color:severityChart[colorIdx], radius:nodeRadius});
+		}
+		return nodes;
+	}
+	console.log(dataMatrix);
+	function createLinks(dataMatrix){
+		var links = [];
+		for (var i = 1; i < dataMatrix.length; i++){
+			for (var j = i+1; j < dataMatrix.length; j++){
+				//console.log("Parrot");
+				var corrData = +dataMatrix[i][j];
+				var linkColor = "green";
+				if (corrData > linkThreshold){
+					corrData *= linkWidthModifier;
+					links.push({source: dataMatrix[i][0], target: dataMatrix[0][j], width: corrData, color: linkColor, isReverse: false});
+				}
+				else if (corrData < -linkThreshold){
+					corrData *= linkWidthModifier;
+					corrData *= -1;
+					links.push({source: dataMatrix[i][0], target: dataMatrix[0][j], width: corrData, color: "red", isReverse: true});
+				}
+			}
+		}
+		return links;
+	}
+	
+	////console.log("Nodes Good");
+	
+	var nodes = createNodes(symptomRatings);
+	////console.log(nodes);
+	
+	var dataLinks = createLinks(dataMatrix);
+	setTimeout(function()
+	{
+		////console.log("Data Links");
+		////console.log(dataLinks);
+	}, 500);
+	
+	const gData = {
+		nodes: nodes,
+		links: dataLinks,
+	}
+	
+	////console.log("G Data");
+	////console.log(gData);+
+	const elem = document.getElementById('3d-graph');
+	
+    const Graph = ForceGraph3D();
+    Graph(elem)
+		.nodeColor('color')
+		.nodeVal('radius')
+		.linkWidth('width')
+		.linkColor('color')
+		.backgroundColor("white")
+		.nodeResolution(20)
+		/*.linkDirectionalParticles(function(link){
+			if (link.isReverse == true)
+				return 2;
+			return 0;
+		})
+		.linkDirectionalParticleWidth(function(link){
+			if (link.isReverse == true)
+			{
+				console.log(link.width);
+				return link.width *20;
+			}
+			return 0;
+		})
+		.linkDirectionalParticleResolution(20)*/
+		.linkOpacity(0.2)
+		.nodeOpacity(1)
+		.nodeLabel(function(node){
+			var label = "<p style="+'"'+"color:black"+'"'+">" + node.id + "</p>";
+			console.log(label);
+			return label;
+		})
+		.graphData(gData);
+		
   </script>
 </body>
 </html>
