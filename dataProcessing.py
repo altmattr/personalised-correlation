@@ -52,17 +52,17 @@ def normalise_to_range(val, max_val, normal_range):
 		normalise_to_range(4.2,5,100) = 84
 		normalise_to_range(4.2,5,7) = 6
 	"""
-	return int((val/ max_val) * normal_range + -0.5) + 1
+	return int((val/ max_val) * normal_range -0.5) + 1
 
 
-def create_freq_stats_per_avg(data, question_df, response_id, create_csv=False, verbose=False):
+def create_freq_stats_per_avg(data, question_df, response_id, debug=True, create_csv=False, verbose=False):
 	"""
 	Q1|2.9|1
 	Q2|2.5|3
 	Q3|3.7|2
 
 	ind_response: cases
-		response_id found: Series object with index = question, value col = response for question
+		response_id found: Series object with index = question, value q_id = response for question
 		response_id not found: dict populated with 0s
 
 	keep that in mind if you try to access the ind_response object in a diffrent way then as programmed here
@@ -71,7 +71,7 @@ def create_freq_stats_per_avg(data, question_df, response_id, create_csv=False, 
 
 	if not response_id:
 		if verbose: print('response id not found')
-		ind_response = {col:0 for col in data.columns}
+		ind_response = {q_id:0 for q_id in data.columns}
 	else:
 		try:
 			# creates series with questions as index, and individual responses as answers
@@ -79,14 +79,15 @@ def create_freq_stats_per_avg(data, question_df, response_id, create_csv=False, 
 		except KeyError:
 			# populate dict with zeroes, has questions as key
 			if verbose: print('response id not found')
-			ind_response = {col:0 for col in data.columns}
+			ind_response = {q_id:0 for q_id in data.columns}
 
+	data_columns = data.columns
 	questions = []
-	for col in data.columns:
-		# get question string for that question 'col' and format away all the bad stuff
-		question_str = question_df[col].replace('\n',' ').split('\t')[-1]
-		# score, count for this col
-		values = data[col].value_counts()
+	for q_id in data_columns:
+		# get question string for that question 'q_id' and format away all the bad stuff
+		question_str = question_df[q_id].replace('\n',' ').split('\t')[-1]
+		# score, count for this q_id
+		values = data[q_id].value_counts()
 
 		# don't include zeroes in average calculation
 		if 0 in values.index:
@@ -101,24 +102,36 @@ def create_freq_stats_per_avg(data, question_df, response_id, create_csv=False, 
 		# add average response for question
 		avg = float('%.2f' % (count/total))
 
-		max_val = int(data[col].max())
+		max_val = int(data[q_id].max())
 
 		# change average to a scaled normalised average between 1 and 100 (for data visualisation purposes)
 		scaled_avg = normalise_to_range(avg, max_val, 100)
 		# # FOR TESTING print('{0}/{1} becomes {2}'.format(avg, max_val, scaled_avg))
 
-		ind_val = int(ind_response[col])
+		ind_val = int(ind_response[q_id])
 		# normalise the values to a range: 
 		# i.e. if the possible answers were 1:max_val, then the new range of values is between 1:4
 		ind_normalised = normalise_to_range(ind_val,max_val,4)
 
 		# load items into list
-		row = [question_str, ind_normalised, scaled_avg]
+		row = [question_str, ind_normalised, int(avg), scaled_avg]
 		# load row into questions list
 		questions.append(row)
 
-	return questions
+	# for accessing the column 
+	avg_colname = 'Average'
+	q_df = pd.DataFrame(questions, columns= {'Q':0, 'Ind':1, avg_colname:2, 'Scaled':3}).fillna(0)
+	q_df[avg_colname] = q_df[avg_colname].apply(lambda x: pow(x,2))
+	min_a = q_df[avg_colname].min()
+	q_df[avg_colname] = q_df[avg_colname].apply(lambda x: x - min_a+1)
+	max_a = q_df[avg_colname].max()
+	q_df[avg_colname] = q_df[avg_colname].apply(lambda val: normalise_to_range(val,max_a,100))
 
+	q_res = []
+	for i,row in q_df.iterrows():
+	    q_res.append(row.values.tolist())
+	    
+	return q_res
 
 
 def main(response_id=None, create_stats=True, verbose=True):
