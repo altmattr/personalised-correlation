@@ -34,6 +34,7 @@ var linkOpacity = 0.2;
 var linkHOpacity = 1;
 var currentOpacity = linkOpacity;
 
+var responsiveWidth = window.innerWidth * 0.7;
 var nodeResolution = 20;
 var labelTextColor = "black";
 var backgroundColor = "white";

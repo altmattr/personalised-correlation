@@ -116,6 +116,7 @@ function generateWord3DGraph(){
           txtSprite.textHeight = nodeTextSize;
           return txtSprite;
 		})
+		.width(responsiveWidth)
 		.graphData(gData);
 }
 
@@ -140,7 +141,9 @@ function generate3DGraph(){
 			var label = "<p style="+'"'+"color:"+ labelTextColor +'"'+">" + node.symptom + "</p>";
 			return label;
 		})
-		.graphData(gData);
+		.width(responsiveWidth)
+		.graphData(gData)
+		.onNodeHover(node => elem.style.cursor = node ? 'pointer' : null);
 }
 
 function toggleHighlightNode(node){

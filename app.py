@@ -23,14 +23,16 @@ def index():
 def get_survey_data():
 
     # make a call to the qualtrics API to update the user data files
-    # uses 
+    # uses qualtricsApiDownloadsDATA.py
     get_all_results(apiToken='CAd56GmSu02n04L1INwMYGOdaDzJXktCXiSGnUFJ', surveyId='SV_2i51uu8Vidq2zC5')
 
     # get the value of userID query string (i.e. ?response_id=some-value)
     response_id = request.args.get('response_id')
 
+    # get correlation matrix data
     data = correlation_data_to_list()
 
+    # generate individual's symptom data and the group averages
     symptom_data = dataProcessing.main(response_id)
 
     return render_template("index.html", data=data, symptomData=symptom_data)

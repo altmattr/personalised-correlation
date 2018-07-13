@@ -1,3 +1,18 @@
+body {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    padding: 0.5em;
+}
+
+#main {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+h1 {
+    margin: 0.5em;
+}
+
 .button {
     display: inline-block;
     padding: 15px 25px;
@@ -7,29 +22,22 @@
     text-decoration: none;
     outline: none;
     color: #fff;
-    background-color: #81D6AF;
+    background-color: rgb(98, 181, 219);
     border: none;
     border-radius: 15px;
-    box-shadow: 0 9px #999;
+    box-shadow: 0 9px #435e6b;
   }
   
-  .button:hover {background-color: #65A789}
+  .button:hover {background-color:rgb(29, 134, 183)}
   
   .button:active {
-    background-color: #3e8e41;
-    box-shadow: 0 5px #666;
+    background-color: rgb(8, 61, 135, 1);
+    box-shadow: 0 5px #435e6b;
     transform: translateY(4px);
   }
   
-  #inputArena{
-    display: table;
-    width: 100%; 
-    table-layout: fixed;
-    border-spacing: 10px; 
-  }
-  
   .inputArea{
-      display: table-cell;
+        margin-bottom: 1em;
   }
   
   
@@ -65,4 +73,28 @@
       border-radius: 50%;
       background: #4CAF50;
       cursor: pointer;
+  }
+
+  #inputArena {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-content: center;
+      flex-wrap: wrap;
+      min-height: 150px;
+      max-width: 30%;
+  }
+
+  p {
+      background-color: white;
+      padding: 1em;
+      border: 1px solid rgb(8, 61, 135);
+  }
+
+  .inputArea p {
+      color: gray;
+      font-style: italic;
+      margin-top: 8px;
+      padding: initial;
+      border: none;
   }
