@@ -111,7 +111,8 @@ function generateWord3DGraph(){
 		.nodeOpacity(1)
 		.onNodeClick(toggleHighlightNode)
 		.nodeThreeObject(node => {
-          let txtSprite = new SpriteText(node.id);
+		  console.log(node.symptom);
+          let txtSprite = new SpriteText(node.symptom);
           txtSprite.color = node.color;
           txtSprite.textHeight = nodeTextSize;
           return txtSprite;
