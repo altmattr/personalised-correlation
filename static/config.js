@@ -11,7 +11,7 @@ var severityChart =
 	"rgb(8, 61, 135, 1)",
 ]
 
-var nodeSizeModifier = 0.1;
+var nodeSizeModifier = 1;
 var maxNodeSize = 10;
 var minNodeSize = 0.5;
 var nodeTextSize = 8;
