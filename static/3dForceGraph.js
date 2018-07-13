@@ -111,13 +111,13 @@ function generateWord3DGraph(){
 		.nodeOpacity(1)
 		.onNodeClick(toggleHighlightNode)
 		.nodeThreeObject(node => {
-		  console.log(node.symptom);
-          let txtSprite = new SpriteText(node.symptom);
+          let txtSprite = new SpriteText(node.id);
           txtSprite.color = node.color;
           txtSprite.textHeight = nodeTextSize;
           return txtSprite;
 		})
 		.width(responsiveWidth)
+		.onNodeHover(node => elem.style.cursor = node ? 'pointer' : null)
 		.graphData(gData);
 }
 
