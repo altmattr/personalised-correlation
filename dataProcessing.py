@@ -69,17 +69,22 @@ def create_freq_stats_per_avg(data, question_df, response_id, create_csv=False, 
 
 	"""
 
-	try:
-		# creates series with questions as index, and individual responses as answers
-		ind_response = data.loc[response_id].fillna(0)
-	except KeyError:
-		# populate dict with zeroes, has questions as key
+	if not response_id:
 		if verbose: print('response id not found')
 		ind_response = {col:0 for col in data.columns}
+	else:
+		try:
+			# creates series with questions as index, and individual responses as answers
+			ind_response = data.loc[response_id].fillna(0)
+		except KeyError:
+			# populate dict with zeroes, has questions as key
+			if verbose: print('response id not found')
+			ind_response = {col:0 for col in data.columns}
 
 	questions = []
 	for col in data.columns:
-		question_str = question_df[col].replace('\n','').split('\t')[-1]
+		# get question string for that question 'col' and format away all the bad stuff
+		question_str = question_df[col].replace('\n',' ').split('\t')[-1]
 		# score, count for this col
 		values = data[col].value_counts()
 
@@ -116,7 +121,7 @@ def create_freq_stats_per_avg(data, question_df, response_id, create_csv=False, 
 
 
 
-def main(response_id, create_stats=True, verbose=True):
+def main(response_id=None, create_stats=True, verbose=True):
 	if verbose: print('begun main processing')
 
 	# read in data, most resource intensive operation
@@ -210,7 +215,7 @@ if __name__ == '__main__':
 	start = time.time()
 	valid = 'R_b437z8esnOET9yd'
 	invalid = 'bad_id'
-	res = main(valid)
+	res = main()
 	print(*res, sep='\n')
 	end = time.time()
 	print('main() process took ',end - start, ' seconds to execute.')
