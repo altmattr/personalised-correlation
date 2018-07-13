@@ -23,6 +23,7 @@ def index():
 def get_survey_data():
 
     # make a call to the qualtrics API to update the user data files
+    # uses 
     get_all_results(apiToken='CAd56GmSu02n04L1INwMYGOdaDzJXktCXiSGnUFJ', surveyId='SV_2i51uu8Vidq2zC5')
 
     # get the value of userID query string (i.e. ?response_id=some-value)
