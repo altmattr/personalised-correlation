@@ -5,7 +5,7 @@ body {
 
 #main {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     flex-wrap: wrap;
 }
 
@@ -78,11 +78,13 @@ h1 {
   #inputArena {
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
+      padding: 1em;
       align-content: center;
       flex-wrap: wrap;
       min-height: 150px;
       max-width: 30%;
+      border: 1px solid rgb(8, 61, 135);
   }
 
   p {
