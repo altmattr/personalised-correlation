@@ -31,7 +31,7 @@ def create_freq_stats_per_value(data):
 	for col in data.columns:
 		values = data[col].value_counts()
 		if 0 in values.index:
-		    values = values.drop(0)
+			values = values.drop(0)
 
 		total = values.sum()
 
@@ -55,7 +55,7 @@ def normalise_to_range(val, max_val, normal_range):
 	return int((val/ max_val) * normal_range + -0.5) + 1
 
 
-def create_freq_stats_per_avg(data, response_id, create_csv=False, verbose=False):
+def create_freq_stats_per_avg(data, question_df, response_id, create_csv=False, verbose=False):
 	"""
 	Q1|2.9|1
 	Q2|2.5|3
@@ -79,37 +79,38 @@ def create_freq_stats_per_avg(data, response_id, create_csv=False, verbose=False
 
 	questions = []
 	for col in data.columns:
-	    # score, count for this col
-	    values = data[col].value_counts()
+		question_str = question_df[col].replace('\n','').split('\t')[-1]
+		# score, count for this col
+		values = data[col].value_counts()
 
-	    # don't include zeroes in average calculation
-	    if 0 in values.index:
-	        values = values.drop(0)
+		# don't include zeroes in average calculation
+		if 0 in values.index:
+			values = values.drop(0)
 
-	    # calc average
-	    count = 0
-	    total = 0
-	    for k,v in values.items():
-	        total+= v
-	        count+=int(k)*v
-	    # add average response for question
-	    avg = float('%.2f' % (count/total))
+		# calc average
+		count = 0
+		total = 0
+		for k,v in values.items():
+			total+= v
+			count+=int(k)*v
+		# add average response for question
+		avg = float('%.2f' % (count/total))
 
-	    max_val = int(data[col].max())
+		max_val = int(data[col].max())
 
-	    # change average to a scaled normalised average between 1 and 100 (for data visualisation purposes)
-	    scaled_avg = normalise_to_range(avg, max_val, 100)
-	    # # FOR TESTING print('{0}/{1} becomes {2}'.format(avg, max_val, scaled_avg))
+		# change average to a scaled normalised average between 1 and 100 (for data visualisation purposes)
+		scaled_avg = normalise_to_range(avg, max_val, 100)
+		# # FOR TESTING print('{0}/{1} becomes {2}'.format(avg, max_val, scaled_avg))
 
-	    ind_val = int(ind_response[col])
-	    # normalise the values to a range: 
-	    # i.e. if the possible answers were 1:max_val, then the new range of values is between 1:4
-	    ind_normalised = normalise_to_range(ind_val,max_val,4)
+		ind_val = int(ind_response[col])
+		# normalise the values to a range: 
+		# i.e. if the possible answers were 1:max_val, then the new range of values is between 1:4
+		ind_normalised = normalise_to_range(ind_val,max_val,4)
 
-	    # load items into list
-	    row = [col, scaled_avg, ind_normalised]
-	    # load row into questions list
-	    questions.append(row)
+		# load items into list
+		row = [question_str, ind_normalised, scaled_avg]
+		# load row into questions list
+		questions.append(row)
 
 	return questions
 
@@ -124,14 +125,16 @@ def main(response_id, create_stats=True, verbose=True):
 	# find response_id regardless of string format
 	pattern = re.compile('(?i)response ?_?id') # case insensitive, 'responseid', with '_',' ' or '' separating the words.
 	for col in data.columns:
-	    match = re.search(pattern,col)
-	    if match:
-	        response_id_colname = match.group(0)
-	        break
+		match = re.search(pattern,col)
+		if match:
+			response_id_colname = match.group(0)
+			break
 
 	data.set_index(response_id_colname, inplace=True)
 
 	if verbose: print(response_id_colname, 'column found.')
+
+	question_df = data.iloc[0]
 
 	# drop first 2 rows to remove irrelevant data
 	data = data.iloc[2:]
@@ -145,15 +148,17 @@ def main(response_id, create_stats=True, verbose=True):
 
 	# remove any column that cannot be converted into a float
 	for col in data.columns:
-	    try:
-	        # check first value in column to see if it can be cast to float object
-	        float(data[col].iloc[0])
-	    except ValueError:
-	        # if not, then we don't want it. (likely a string)
-	        drop_cols.append(col)
+		try:
+			# check first value in column to see if it can be cast to float object
+			float(data[col].iloc[0])
+		except ValueError:
+			# if not, then we don't want it. (likely a string)
+			drop_cols.append(col)
 
 	data.drop(drop_cols, axis=1,inplace=True)
 
+	# filter the quesiton string row
+	question_df = question_df[keep_cols].drop(drop_cols)
 
 	# cast values to int
 	data = data.astype(float)
@@ -162,7 +167,7 @@ def main(response_id, create_stats=True, verbose=True):
 	# create frequency statistics
 	if create_stats:
 		# CHANGE THIS to create_freq_stats_per_value if needed
-		freq_data = create_freq_stats_per_avg(data, response_id, verbose=verbose)
+		freq_data = create_freq_stats_per_avg(data, question_df, response_id, verbose=verbose)
 
 		if verbose: print('freq stats created.')
 
