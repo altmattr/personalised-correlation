@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 import csv
 import os.path
 import dataProcessing
@@ -16,12 +16,11 @@ def correlation_data_to_list():
 
 @app.route('/')
 def index():
-    return 'hello'
+    return redirect('/data?response_id=R_b437z8esnOET9yd', code=302)
 
 
 @app.route('/data')
 def get_survey_data():
-    #TODO: crash gracefully
 
     # make a call to the qualtrics API to update the user data files
     get_all_results(apiToken='CAd56GmSu02n04L1INwMYGOdaDzJXktCXiSGnUFJ', surveyId='SV_2i51uu8Vidq2zC5')

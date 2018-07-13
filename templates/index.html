@@ -1,116 +1,38 @@
 <html>
+
 <head>
-  <script src="https://unpkg.com/3d-force-graph@1.35.4/dist/3d-force-graph.min.js"></script>
+	<script src="https://unpkg.com/3d-force-graph@1.35.4/dist/3d-force-graph.min.js"></script>
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<script src="https://unpkg.com/three"></script>
+	<script src="https://unpkg.com/three-spritetext"></script>
+	<link rel="stylesheet" href="/static/style.css">
+	<script src="/static/3dForceGraph.js"></script>
 </head>
 <body>
-  <div id="3d-graph"></div>
-  <script>
-
-	// Receive csv data from the python app
-	var dataMatrix = {{ data|safe }}; // correlation
-	var symptomRatings = {{ symptomData|safe }}; // averages freq.csv
-  
-		//Config Data:
-	//Color of nodes, index as rating
-	var severityChart = 
-	[
-		"rgb(183, 232, 255, 1)",
-		"rgb(98, 181, 219, 1)",
-		"rgb(29, 134, 183, 1)",
-		"rgb(8, 61, 135, 1)",
-	]
-
-	var nodeSizeModifier = 2;
-	var maxNodeSize = 5;
-	var minNodeSize = 0.5;
-	//Determines what links will be displayed 
-	//i.e anything less than -linkThreshold and anything greater than linkThreshold
-	var linkThreshold = 5;
-	var linkWidthModifier = 0.3;
-	var maxLinkWidth = 8;
-	var minLinkWidth = 0.1;
-	var posCorrLinkColor = "green";
-	var negCorrLinkColor = "red";
-	
-	var nodeResolution = 20;
-	var labelTextColor = "black";
-	var backgroundColor = "white";
-	//End of Config 
-	// Node
-	function createNodes(dataMatrix, symptomRatings){
-		var nodes = [];
-		for (var i = 1; i < dataMatrix.length; i++){
-			symptIdx = i-1;
-			var colorIdx = symptomRatings[symptIdx][2]-1;
-			var nodeRadius = symptomRatings[symptIdx][1];
-			nodeRadius *= nodeRadius;
-			nodeRadius = Math.max(Math.min(nodeRadius, maxNodeSize), minNodeSize);
-			//Node in the form: 
-			//nodes.push({id:node ID make sure this is the same as linked, index: idx or id of node by unique number 0 - (max node-1), color: colour of node, 
-			//radius: size of node, symptom: name of symptom)
-			nodes.push({id:dataMatrix[0][i], index: i, color:severityChart[colorIdx], radius:nodeRadius, symptom:symptomRatings[symptIdx][0]});
-		}
-		return nodes;
-	}
-	
-	
-	
-	function createLinks(dataMatrix){
-		var links = [];
-		for (var i = 1; i < dataMatrix.length; i++){
-			for (var j = i+1; j < dataMatrix.length; j++){
-				var corrData = +dataMatrix[i][j];
-				//Links in the form: 
-				//source: which node to link from, target: which node to link to, 
-				//width: size of link, color: colour of link, isReverse: true if is negative correlation else false}}
-				if (corrData > linkThreshold){
-					corrData *= linkWidthModifier;
-					corrData = Math.max(Math.min(corrData, maxLinkWidth), minLinkWidth);
-					links.push({source: dataMatrix[i][0], target: dataMatrix[0][j], width: corrData, color: posCorrLinkColor, isReverse: false});
-				}
-				else if (corrData < -linkThreshold){
-					corrData *= linkWidthModifier;
-					corrData *= -1;
-					corrData = Math.max(Math.min(corrData, maxLinkWidth), minLinkWidth);
-					links.push({source: dataMatrix[i][0], target: dataMatrix[0][j], width: corrData-1, color: negCorrLinkColor, isReverse: true});
-				}
-			}
-		}
-		return links;
-	}
-	
-	//Calls Create Node to generate array of node objects.
-	console.log(symptomRatings);
-	var nodes = createNodes(dataMatrix, symptomRatings);
-	//Calls CreateLinks to generate array of Link objects.
-	var dataLinks = createLinks(dataMatrix);
-
-	const gData = {
-		nodes: nodes,
-		links: dataLinks,
-	}
-	
-	const elem = document.getElementById('3d-graph');
-	
-    const Graph = ForceGraph3D();
-    Graph(elem)
-		.nodeColor('color')
-		.nodeVal('radius')
-		.linkWidth('width')
-		.linkColor('color')
-		.backgroundColor(backgroundColor)
-		//Resolution 20 looks good, 0 looks like rectangles
-		.nodeResolution(nodeResolution)
-		//Opacity is set between 0 and 1 where 0 is transparent and 1 is opaque
-		.linkOpacity(0.3)
-		.nodeOpacity(1)
-		//Displays the text when hovering a node.
-		.nodeLabel(function(node){
-			var label = "<p style="+'"'+"color:"+ labelTextColor +'; background-color:#fafafa"'+">" + node.symptom + "</p>";
-			return label;
-		})
-		.graphData(gData);
-		
-  </script>
+	<script>
+		// Receive csv data from the python app
+		var dataMatrix = {{data | safe}}; // correlation
+		var symptomRatings = {{symptomData | safe}}; // averages freq.csv
+	</script>
+	<div id="inputArena">
+		<div class="inputArea">
+			<button onclick="alterLinks()" id="alterLinks" class="button">Only Positive</button>
+		</div>
+		<div class="inputArea">
+			<label for="corrStrText">Correlation Strength:</label>
+			<input type="number" id="corrStrText" value="10">
+		</div>
+		<div class="inputArea">
+			<button onclick="generate3DGraphButton(false)" id="regen" class="button">Regenerate</button>
+		</div>
+		<div class="inputArea">
+			<button onclick="generate3DGraphButton(true)" id="wordGen" class="button">Word Representation</button>
+		</div>
+	</div>
+	<div id="3d-graph"></div>
+	<script>
+		document.getElementById("corrStrText").value = linkThreshold;
+		create3DGraph(dataMatrix, symptomRatings);
+	</script>
 </body>
 </html>
