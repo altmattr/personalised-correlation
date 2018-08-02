@@ -26,8 +26,7 @@ Communication between the data processing and the JavaScript handled with Flask.
 The initial data was retrieved from qualtrics via their API. Due to restrictions on the current version of their API, we were unable to filter out any irrelevant columns.
 
 The csv data was loaded into a pandas DataFrame. From there the question columns and the response id column were isolated.
-Questions were dropped if > 90% of responses were missing. Only numerical responses were accepted, any text-response question was also dropped. 
-dropped.
+Questions were dropped if > 90% of responses were missing. Only numerical responses were accepted, any text-response question was also dropped.
 
 #### Retrieving Individual Responses
 
