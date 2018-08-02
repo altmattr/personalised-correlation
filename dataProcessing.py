@@ -138,7 +138,7 @@ def main(response_id=None, create_stats=True, verbose=True):
 	if verbose: print('begun main processing')
 
 	# read in data, most resource intensive operation
-	data = pd.read_csv('data/DSM MQ Data Survey 1.2.csv')
+	data = pd.read_csv('data/qualtrics.csv')
 
 	# find response_id regardless of string format
 	pattern = re.compile('(?i)response ?_?id') # case insensitive, 'responseid', with '_',' ' or '' separating the words.
