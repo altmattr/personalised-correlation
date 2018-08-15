@@ -89,12 +89,6 @@ h1 {
       border: 1px solid rgb(8, 61, 135);
   }
 
-  p {
-      background-color: white;
-      padding: 1em;
-      border: 1px solid rgb(8, 61, 135);
-  }
-
   .inputArea p {
       color: gray;
       font-style: italic;

@@ -26,12 +26,15 @@ def get_all_results(apiToken='CAd56GmSu02n04L1INwMYGOdaDzJXktCXiSGnUFJ', surveyI
         requestCheckUrl = baseUrl + progressId
         requestCheckResponse = requests.request("GET", requestCheckUrl, headers=headers)
         requestCheckProgress = requestCheckResponse.json()["result"]["percentComplete"]
-        #print("Download is " + str(requestCheckProgress) + " complete")
+        print("Download is " + str(requestCheckProgress) + " complete")
 
     # Step 3: Downloading file
     requestDownloadUrl = baseUrl + progressId + '/file'
     requestDownload = requests.request("GET", requestDownloadUrl, headers=headers, stream=True)
 
     # Step 4: Unzipping the file
-    zipfile.ZipFile(io.BytesIO(requestDownload.content)).extractall("data")
-    #print('Complete')
+    with zipfile.ZipFile(io.BytesIO(requestDownload.content)) as myzip:
+        myzip.extractall("data")
+        print('Complete')
+        return myzip.namelist()
+ 

@@ -96,7 +96,7 @@ def create_freq_stats_per_avg(data, question_df, response_id, debug=True, create
 		# calc average
 		count = 0
 		total = 0
-		for k,v in values.items():
+		for k,v in values.iteritems():
 			total+= v
 			count+=int(k)*v
 		# add average response for question
@@ -134,11 +134,11 @@ def create_freq_stats_per_avg(data, question_df, response_id, debug=True, create
 	return q_res
 
 
-def main(response_id=None, create_stats=True, verbose=True):
+def main(dataFile, response_id=None, create_stats=True, verbose=True):
 	if verbose: print('begun main processing')
 
 	# read in data, most resource intensive operation
-	data = pd.read_csv('data/qualtrics.csv')
+	data = pd.read_csv('data/{0}'.format(dataFile))
 
 	# find response_id regardless of string format
 	pattern = re.compile('(?i)response ?_?id') # case insensitive, 'responseid', with '_',' ' or '' separating the words.
@@ -162,7 +162,7 @@ def main(response_id=None, create_stats=True, verbose=True):
 	data = data[keep_cols]
 
 	# drop columns if 90% of it's values are null
-	drop_cols = [col for col, val in data.isnull().sum().items() if val > int(data.shape[0]*0.9)]
+	drop_cols = [col for col, val in data.isnull().sum().iteritems() if val > int(data.shape[0]*0.9)]
 
 	# remove any column that cannot be converted into a float
 	for col in data.columns:
@@ -229,6 +229,6 @@ if __name__ == '__main__':
 	valid = 'R_b437z8esnOET9yd'
 	invalid = 'bad_id'
 	res = main()
-	print(*res, sep='\n')
+	#print(res, sep='\n')
 	end = time.time()
 	print('main() process took ',end - start, ' seconds to execute.')

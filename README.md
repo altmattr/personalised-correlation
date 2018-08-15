@@ -60,3 +60,17 @@ average with increased std: if all of the previous averages are too similar to s
 
 pandas has the ability to create a pearson correlation matrix from a numeric DataFrame (based on numpy implementation). The values are decimals, which required scaling to a new range 1:100, in the same way that the scaled average was computed.
 
+# Authors
+
+<li><a href="https://researchers.mq.edu.au/en/persons/matt-roberts">Matthew Roberts</a></li>
+<li><a href="https://researchers.mq.edu.au/en/persons/miri-forbes">Miri Forbes</a></li>
+<li>Emma Walker</li>
+<li>Tam Du</li>
+<li>Oscar Gardiner</li>
+<li>Kyle Long</li>
+</ul>
+
+# Use
+
+This plugin is open-sourced under the Mozilla public licence and thus there are very few restriction on its use. As an academic project the authors ask that when the code or the public instance are used that citation (in the case of academic use) or donation (in the case of for-profit use) be considered.
+
