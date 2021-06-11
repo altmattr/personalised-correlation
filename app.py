@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect
 import csv
 import requests
 import os.path
+import os
 import dataProcessing
 import pandas as pd
 from api import get_all_results
@@ -38,5 +39,11 @@ def get_survey_data():
     return render_template("index.html", data=corr, symptomData=symptom_data)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    port = os.environ.get("PORT")
+    print(os.environ)
+    print(port)
+    if (port == None):
+        port = 5000
+    print(port)
+    app.run(host='0.0.0.0', port=port, debug=True)
 
