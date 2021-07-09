@@ -212,7 +212,7 @@ def main(dataFile, response_id=None, create_stats=True, verbose=True):
 
 	# turn into integer representation
 	scaled_corr = scaled_corr.round(1)*10
-	scaled_corr.astype(int, inplace=True)
+	scaled_corr.astype(int)
 
 	# save corr matrix
 	data_corr.to_csv('data/corr-matrix.csv')
