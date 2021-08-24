@@ -23,7 +23,7 @@ def index():
     """Main index page. Re-routes to /data using a sample user ID as query string"""
     return render_template("spiel.html")
 
-@app.route('/data')
+@app.route('/dat')
 def get_survey_data():
 
     survey_id   = request.args.get('surveyId',    default="SV_2i51uu8Vidq2zC5")
@@ -31,6 +31,7 @@ def get_survey_data():
 
     # get correlation matrix data
     files = get_all_results(surveyId = survey_id)
+    print("results got")
 
     # generate individual's symptom data and the group averages
     symptom_data = dataProcessing.main(files[0], response_id)
@@ -38,12 +39,18 @@ def get_survey_data():
 
     return render_template("index.html", data=corr, symptomData=symptom_data)
 
+@app.route('/dat_2d')
+def two_d_vis():
+  survey_id   = request.args.get('surveyId',    default="SV_2i51uu8Vidq2zC5")
+  response_id = request.args.get('response_id', default="R_3k7VdqOhcAIj36U")
+
+  dataProcessing.correleation_matrix_to_nodes_and_forces(pd.read_csv("static/data/demo_matrix.csv", header=0, index_col=0))
+
+  return render_template("two_d.html")
+
 if __name__ == '__main__':
     port = os.environ.get("PORT")
-    print(os.environ)
-    print(port)
     if (port == None):
         port = 5000
-    print(port)
     app.run(host='0.0.0.0', port=port, debug=True)
 

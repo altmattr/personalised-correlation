@@ -15,7 +15,6 @@ The goal of this project is to display survey data from qualtrics in an informat
 ### 3D Force Graph using d3.js
 
 
-
 ## Back-end
 
 ### Page serving with Flask

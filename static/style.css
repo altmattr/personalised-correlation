@@ -1,5 +1,12 @@
+@font-face {
+  font-family: "Libertine";
+  src: url("/static/libertinus/LibertinusSerif-Regular.otf"),
+       url("/static/libertinus/LibertinusSerif-Italic.otf"),
+       url("/static/libertinus/LibertinusSerif-Bold.otf"),
+       url("/static/libertinus/LibertinusSerif-BoldItalic.otf");
+}
 body {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-family: 'Libertine', sans-serif;
     padding: 0.5em;
 }
 

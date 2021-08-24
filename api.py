@@ -17,12 +17,15 @@ def get_all_results(apiToken='CAd56GmSu02n04L1INwMYGOdaDzJXktCXiSGnUFJ', surveyI
     # Step 1: Creating Data Export
     downloadRequestUrl = baseUrl
     downloadRequestPayload = '{"format":"' + fileFormat + '","surveyId":"' + surveyId + '"}'
+    print("about to post request")
     downloadRequestResponse = requests.request("POST", downloadRequestUrl, data=downloadRequestPayload, headers=headers)
+    print(downloadRequestResponse.json())
     progressId = downloadRequestResponse.json()["result"]["id"]
     print(downloadRequestResponse.text)
 
     # Step 2: Checking on Data Export Progress and waiting until export is ready
-    while requestCheckProgress < 100 and progressStatus is not "complete":
+    while requestCheckProgress < 100 and progressStatus != "complete":
+        print("waiting for response")
         requestCheckUrl = baseUrl + progressId
         requestCheckResponse = requests.request("GET", requestCheckUrl, headers=headers)
         requestCheckProgress = requestCheckResponse.json()["result"]["percentComplete"]
@@ -36,5 +39,6 @@ def get_all_results(apiToken='CAd56GmSu02n04L1INwMYGOdaDzJXktCXiSGnUFJ', surveyI
     with zipfile.ZipFile(io.BytesIO(requestDownload.content)) as myzip:
         myzip.extractall("data")
         print('Complete')
+        print(myzip.namelist(), flush=True)
         return myzip.namelist()
  
