@@ -9,44 +9,40 @@ from api import get_all_results
 
 app = Flask(__name__) 
 
-def parse_correlation_data():
-    """Get correlation data from the csv and transform into list of tuples"""
-    data = []
-    with open('data/scaled-corr-matrix.csv', 'rt') as csvfile:
-        corr_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
-        for row in corr_reader:
-            data.append(row)
-    return data
-
 @app.route('/')
 def index():
     """Main index page. Re-routes to /data using a sample user ID as query string"""
     return render_template("spiel.html")
 
-@app.route('/dat')
-def get_survey_data():
+@app.route('/connection_check')
+def connection_check():
+    survey_id   = request.args.get('surveyId',    default="none")
+    print("about to call get_all_results", flush=True)
+    files = get_all_results(surveyId=survey_id, fileFormat="csv")
+    print(files[0], flush = True)
+    return render_template("spiel.html")
+
+@app.route('/data_2d')
+def two_d_vis():
 
     survey_id   = request.args.get('surveyId',    default="SV_2i51uu8Vidq2zC5")
-    response_id = request.args.get('response_id', default="R_3k7VdqOhcAIj36U")
+    response_id = request.args.get('response_id', default="")
 
     # get correlation matrix data
-    files = get_all_results(surveyId = survey_id)
+    data = get_all_results(surveyId=survey_id, fileFormat="csv")
     print("results got")
 
     # generate individual's symptom data and the group averages
-    symptom_data = dataProcessing.main(files[0], response_id)
-    corr = parse_correlation_data()
+    (nodes, links) = dataProcessing.main(data, response_id)
 
-    return render_template("index.html", data=corr, symptomData=symptom_data)
+    return render_template("two_d.html", nodes=nodes.to_csv(), links=links.to_csv())
 
-@app.route('/dat_2d')
-def two_d_vis():
-  survey_id   = request.args.get('surveyId',    default="SV_2i51uu8Vidq2zC5")
-  response_id = request.args.get('response_id', default="R_3k7VdqOhcAIj36U")
+@app.route('/demo_2d')
+def two_d_demo():
+  response_id = request.args.get('response_id', default="R_3IcolP1ze4SFUU2")
+  (nodes, links) = dataProcessing.main(pd.read_csv('data/demo.csv'), response_id)
 
-  dataProcessing.correleation_matrix_to_nodes_and_forces(pd.read_csv("static/data/demo_matrix.csv", header=0, index_col=0))
-
-  return render_template("two_d.html")
+  return render_template("two_d.html", nodes=nodes.to_csv(), links=links.to_csv())
 
 if __name__ == '__main__':
     port = os.environ.get("PORT")

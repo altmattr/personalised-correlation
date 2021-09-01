@@ -3,13 +3,62 @@
 {% block head %}
 <style>
 
+ body, svg{
+   background-color: rgb(11,23,46);
+   color: white;
+ }
+
+.emph {
+  color: rgb(254,191,45)
+}
+
+a {
+  color: rgb(240,240,240);
+}
+
 .links line {
   stroke: #999;
 }
 
-.nodes circle {
+circle {
   stroke: #fff;
   stroke-width: 0px;
+}
+
+li {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='-1 -1 2 2'><circle fill='white' r='1' /></svg>");
+}
+li.little {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='-1 -1 2 2'><circle fill='rgb(244,232,198)' r='1' /></svg>");
+}
+li.somewhat {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='-1 -1 2 2'><circle fill='rgb(254,229,158)' r='1' /></svg>");
+}
+li.very {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='-1 -1 2 2'><circle fill='rgb(254,216,110)' r='1' /></svg>");
+}
+li.perfect {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='-1 -1 2 2'><circle fill='rgb(254,191,45)' r='1' /></svg>");
+}
+li.not_size {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='5' height='5' viewBox='-1 -1 2 2'><circle fill='white' r='1' /></svg>");
+}
+li.little_size {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='-1 -1 2 2'><circle fill='white' r='1' /></svg>");
+}
+li.somewhat_size {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='-1 -1 2 2'><circle fill='white' r='1' /></svg>");
+}
+li.very_size {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='-1 -1 2 2'><circle fill='white' r='1' /></svg>");
+}
+li.perfect_size {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='25' height='25' viewBox='-1 -1 2 2'><circle fill='white' r='1' /></svg>");
+}
+li span {
+  margin-left: -10px;
+  padding-right: 5px;
+  font-size: 3em;
 }
 
 </style>
@@ -17,26 +66,74 @@
 
 {% block content %}
 <script>
+var node_frame = {{nodes | tojson }};
+var link_frame = {{links | tojson }};
 var globals = {
   node_size: 5,
-  dist: 0.3,
-  strength: 0.2,
-  sim: null
+  links_data: null
 }</script>
+<div style="display:none">
 <p>zoom<input id = "zoom" type="range" min="1200" max="5000" oninput="set_vis_size(this)"/></p>
+<p>left-right<input id = "left-right" type="range" min="-10000" max="10000" oninput="set_vis_size(this)"/></p>
+<p>up-down<input id = "up-down" type="range" min="-10000" max="10000" oninput="set_vis_size(this)"/></p>
 <p>max-dist<input id="max-dist" type="number" value="20" onchange="show_vis()"/>enable:<input id="dist-on" type="checkbox" onchange="console.log('huh');show_vis()"/></p>
 <p>max-strength<input id="max-strength" type="number" value="1" onchange="show_vis()"/>enable:<input id="strength-on" type="checkbox" onchange="show_vis()"/></p>
-<svg id="vis" width="1200" height="1200" viewBox="0 0 1200 1200"></svg>
+<p>collision enable:<input id="collision-on" type="checkbox" onchange="show_vis()" checked="true"/></p>
+</div>
+<div style="display:flex">
+<div style="flex-grow:1000"><svg id="vis" viewBox="-2500 -2500 5000 5000"></svg></div>
+<div style="flex-grow:1; width: 300px">
+<p>This image shows how <span class="emph">your responses</span> fit in with the patterns we've found for everyone who have completed the survey so far.</p>
+<p>Each circle represents an item in the survey.</p>
+<p>If you hover your mouse over a circle you see the wording of that item.</p>
+<p>Items that are closely related to each other are closer together, and items that are less closely related are further apart.</p>
+<p>For example, if poeple tend to give similar answers to a set of items, those items will cluster together.</p>
+<p><span class="emph">The colours of the circles are based on your responses:</span><ul><li>Not at all true (Never)</li><li class='little'>A little true (Rarely)</li><li class="somewhat">Somewhat true (Sometimes)</li><li class="very">Very true (Often)</li><li class="perfect">Perfectly true (Always)</li></ul></p>
+<p><span class="emph">So dark yellow clusters show groups of symptoms you reported experiencing a lot in the past year.</span></p>
+<p>The sizes of the circles are based on how common each item is in the sample (the average response):<ul><li class="not_size">Not at all true (Never)</li><li class="little_size">A little true (Rarely)</li><li class="somewhat_size">Somewhat true (Sometimes)</li><li class="very_size">Very true (Often)</li><li class="perfect_size">Perfectly true (Always)</li></ul></p>
+<p>To learn more about how this figure was genereated, go to <a href=https://bit.ly/mentalillnessstudy>https://bit.ly/mentalillnessstudy</a></p>
+</div>
+</div>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
 var simulation;
 var zoom = 2500;
-
-d3.select("svg").on("scroll", function(d){console.log(d)})
+var x_left = 0;
+var x_right = 0;
 
 function set_vis_size(elt){
-  document.querySelector('svg').setAttribute('viewBox', '-'+elt.value/3+ ' -'+elt.value/3+ ' '+ elt.value+ ' '+ elt.value);
+  z = document.getElementById("zoom").value;
+  x = document.getElementById("left-right").value;
+  y = document.getElementById("up-down").value;
+  document.querySelector('svg').setAttribute("viewBox",  `${x} ${y} ${z} ${z}`);
+}
+
+
+function response_to_shadeA(resp){
+  if (resp <= 1)
+    return "rgb(240,240,240)"
+  if (resp <= 2)
+    return "rgb(218,227,242)"
+  if (resp <=3)
+    return "rgb(143,171,218)"
+  if (resp <=4)
+    return "rgb(70,116,193)"
+  else
+    return "rgb(48,87,149)"
+}
+
+function response_to_shadeB(resp){
+  if (resp <= 1)
+    return "rgb(255,255,255)"
+  if (resp <= 2)
+    return "rgb(244,232,198)"
+  if (resp <=3)
+    return "rgb(254,229,158)"
+  if (resp <=4)
+    return "rgb(254,216,110)"
+  else
+    return "rgb(254,191,45)"
 }
 
 function show_vis(){
@@ -47,105 +144,71 @@ function show_vis(){
       height = +svg.attr("height");
 
   // sync the zoom with the slider
-  set_vis_size(document.getElementById("zoom"));
+  // set_vis_size(document.getElementById("zoom"));
 
   // clear any existing content
   svg.selectAll("*").remove();
+  
+  var nodes_data = d3.csvParse(node_frame);
 
-  d3.csv("/static/data/nodes.csv", function(nodes_data) {
+  //set up the simulation 
+  //nodes only for now 
+  simulation = d3.forceSimulation()
+            //add nodes
+            .nodes(nodes_data);	
+      
+  //add forces
+  //we're going to add a charge to each node 
+  //also going to add a centering force
+  simulation
+      .force("charge_force", d3.forceManyBody())
+      .force("center_force", d3.forceCenter(width / 2, height / 2));
 
-    //set up the simulation 
-    //nodes only for now 
-    simulation = d3.forceSimulation()
-              //add nodes
-              .nodes(nodes_data);	
-        
-    //add forces
-    //we're going to add a charge to each node 
-    //also going to add a centering force
-    simulation
-        .force("charge_force", d3.forceManyBody())
-        .force("center_force", d3.forceCenter(width / 2, height / 2));
+  //draw circles for the nodes 
+  var nodes = svg.append("g")
+                .attr("class", "nodes")
+                .selectAll("circle")
+                .data(nodes_data)
+                .enter()
+                .append("circle")
+                .attr("r", function(d){return d.freq*10})
+                .attr("fill", function(d){return response_to_shadeB(d.response)})
+                .on("click", function(node){console.log(d3.select(node));})
+  d3.selectAll("circle").append("svg:title").text(function(d){return `${d.name}, avg: ${d.freq}, resp: ${d.response}`})
 
-    //draw circles for the nodes 
-    var nodes = svg.append("g")
-                  .attr("class", "nodes")
-                  .selectAll("circle")
-                  .data(nodes_data)
-                  .enter()
-                  .append("circle")
-                  .attr("r", globals.node_size)
-                  .attr("fill", "red")
-                  .on("click", function(node){console.log(d3.select(node));})
-    d3.selectAll("circle").append("svg:title").text(function(d){return d.name})
+  //fetch links data 
+  var links_data = d3.csvParse(link_frame);
+  //draw lines for the links 
+  // var links = svg.append("g")
+  //                .attr("class", "links")
+  //                .selectAll("line")
+  //                .data(links_data)
+  //                .enter()
+  //                .append("line")
+  //                .attr("stroke", "black")
+  //                .attr("stroke-width", function(d){return 1;});        
 
-    //fetch links data 
-    d3.csv("/static/data/forces.csv", function(links_data) {
-      // console.log(links_data);
-      //draw lines for the links 
-      // var links = svg.append("g")
-      //                .attr("class", "links")
-      //                .selectAll("line")
-      //                .data(links_data)
-      //                .enter().append("line")
-      //                .attr("stroke-width", function(d){console.log(d); return 0.5;});        
+  var link_force =  d3.forceLink(links_data)
+                      .id(function(d) { return d.name; })
+                      .strength(function(d) {return d.normalisedforce})
+  simulation.force("link",link_force)
 
-      //Create the link force 
-      //We need the id accessor to use named sources and targets 
+  simulation.force("collision", d3.forceCollide().radius(function(d){return d.freq*10}))
 
-      var link_force =  d3.forceLink(links_data)
-                          .id(function(d) { return d.name; })
+  function tickActions() {
+    console.log("tick");
+    nodes.attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; });
+    // links.attr("x1", function(d) { return d.source.x; })
+    //      .attr("y1", function(d) { return d.source.y; })
+    //      .attr("x2", function(d) { return d.target.x; })
+    //      .attr("y2", function(d) { return d.target.y; });
 
-      // function setDistance(md){
-      //   link_force.distance(function(d){
-      //               var dist = md + (d.force * md)*-1
-      //               d.distance = dist
-      //               return dist;
-      //             })
-      // }
+  }
 
-      // function setStrength(md){
-      //   link_force.strength(function(d){
-      //               md*d.force
-      //             });
-      // }
+  //add tick instructions: 
+  simulation.on("tick", tickActions );
 
-      // if (document.getElementById("dist-on").checked) {
-      //   setDistance(parseInt(document.getElementById("max-dist")));
-      // }
-      // if (document.getElementById("strength-on").checked){
-      //   setStrength(1);
-      // }
-      simulation.force("link",link_force)
-
-    function tickActions() {
-      console.log("tick");
-      nodes.attr("cx", function(d) { return d.x; })
-          .attr("cy", function(d) { return d.y; });
-      // links.attr("x1", function(d) { return d.source.x; })
-      //      .attr("y1", function(d) { return d.source.y; })
-      //      .attr("x2", function(d) { return d.target.x; })
-      //      .attr("y2", function(d) { return d.target.y; });
-
-    }
-    //add tick instructions: 
-    simulation.on("tick", tickActions );
-
-    // register for updates
-    // document.getElementById("max-dist").onchange = function(evt){
-    //   console.log(evt);
-    //   setDistance(parseInt(evt.srcElement.value));
-    //   simulation.alpha(0.5).restart()
-    // }
-    // document.getElementById("max-strength").onchange = function(evt){
-    //   console.log(evt);
-      // setStrength(parseInt(evt.srcElement.value));
-      // simulation.alpha(0.5).restart()
-    // }
-                    
-
-    });
-  });
 }
 show_vis();
 </script>
