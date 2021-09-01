@@ -10,13 +10,14 @@ def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
     # get the token and data center for this survey
     data = pd.read_csv("data/tokens.csv")
     if (os.environ.get(surveyId)):
-      print("token retrieved from env")
+      print("token retrieved from env", flush=True)
       token = os.environ.get(surveyId)
     else:
-      print("token retrieved from file")
-      token = data.loc[data["survey"] == surveyId]["token"][0].strip()
+      print("token retrieved from file", flush=True)
+      print(data.loc[data["survey"] == surveyId]["token"].values[0], flush=True)
+      token = data.loc[data["survey"] == surveyId]["token"].values[0].strip()
     # data center is always retrieved from file
-    data_center = data.loc[data["survey"] == surveyId]["data_center"][0].strip()
+    data_center = data.loc[data["survey"] == surveyId]["data_center"].values[0].strip()
 
     # Setting static parameters
     requestCheckProgress = 0
