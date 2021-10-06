@@ -27,6 +27,7 @@ def two_d_vis():
 
     survey_id   = request.args.get('surveyId',    default="SV_2i51uu8Vidq2zC5")
     response_id = request.args.get('response_id', default="")
+    print(response_id, flush=True)
 
     # get correlation matrix data
     data = get_all_results(surveyId=survey_id, fileFormat="csv")
@@ -40,7 +41,7 @@ def two_d_vis():
 @app.route('/demo_2d')
 def two_d_demo():
   response_id = request.args.get('response_id', default="R_3IcolP1ze4SFUU2")
-  (nodes, links) = dataProcessing.main(pd.read_csv('data/demo.csv'), response_id)
+  (nodes, links) = dataProcessing.main(pd.read_csv('data/demo.csv'), response_id, ".*")
 
   return render_template("two_d.html", nodes=nodes.to_csv(), links=links.to_csv())
 

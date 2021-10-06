@@ -5,10 +5,11 @@ import io
 import pandas as pd
 import os
 import glob
+import re
 
 def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
     # get the token and data center for this survey
-    data = pd.read_csv("data/tokens.csv")
+    data = pd.read_csv("data/tokens.csv", dtype='unicode')
     if (os.environ.get(surveyId)):
       print("token retrieved from env", flush=True)
       token = os.environ.get(surveyId)
@@ -18,6 +19,8 @@ def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
       token = data.loc[data["survey"] == surveyId]["token"].values[0].strip()
     # data center is always retrieved from file
     data_center = data.loc[data["survey"] == surveyId]["data_center"].values[0].strip()
+    # regex is always retrieved from file
+    regex = data.loc[data["survey"] == surveyId]["regex"].values[0].strip()
 
     # Setting static parameters
     requestCheckProgress = 0
@@ -58,7 +61,9 @@ def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
         myzip.extractall("tmp")
         print('Complete')
         print(myzip.namelist(), flush=True)
-        ret = pd.read_csv('tmp/{0}'.format(myzip.namelist()[0]))
+        ret = pd.read_csv('tmp/{0}'.format(myzip.namelist()[0]), dtype='unicode')
+        cols = [c for c in ret.columns if (re.match(regex, c) or re.match('(?i)response ?_?id', c))]
+        ret = ret[cols]
     globpatt = glob.glob('tmp/*')
     for f in globpatt:
       os.remove(f)

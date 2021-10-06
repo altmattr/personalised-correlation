@@ -17,6 +17,10 @@ def main(data, response_id):
 
   data.set_index(response_id_colname, inplace=True)
 
+  # lets see what indexes we have
+  # print(data.index.tolist(), flush=True)
+
+
   print(response_id_colname, 'column found.', flush=True)
 
   # question_df = data.iloc[0]
@@ -25,6 +29,7 @@ def main(data, response_id):
   # data = data.iloc[2:]
 
   # keep question columns
+  # TODO: not needed anymore
   keep_cols = [col for col in data.columns if col.lower().startswith('q')]
   data = data[keep_cols]
 
@@ -36,6 +41,8 @@ def main(data, response_id):
   # filter the quesiton string row
   # question_df = question_df[keep_cols].drop(drop_cols)
 
+  # grab the questions before we wipe them out with the numeric coersion
+  questions = data.iloc[0]
   print('DataFrame has been cleaned', flush=True)
 
   data = data.apply(pd.to_numeric, errors='coerce')
@@ -60,13 +67,18 @@ def main(data, response_id):
   for i, row in nodes.iterrows():
     nodes.loc[i,'freq'] = data[i][lambda x: x > 1].dropna().mean() 
 
+
   # for each node, get this participants response
   for i, row in nodes.iterrows():
     try: # if we don't have that response_id, just give 0
       nodes.loc[i,'response'] = data.loc[response_id, i]
-      break
     except KeyError:
       nodes.loc[i, 'response'] = 0
+
+  #for each node, add the question text
+  print(data.iloc[0], flush=True)
+  for i, row in nodes.iterrows():
+    nodes.loc[i,'text'] = questions.loc[i].removeprefix("Now we ask you to respond to a number of statements about your thoughts, feelings, experiences, a...-")
 
   nodes.to_csv("static/data/nodes.csv")
 
@@ -93,7 +105,7 @@ def fake_nodes_from_correlation_matrix(data_corr):
 
 def correleation_matrix_to_nodes_and_forces(data_corr):
 
-  threshold = 0.25
+  threshold = 0.55
 
   # From the correlation matrix, create a frame in the form that d3 would prefer for forces
   force_frame = pd.DataFrame(columns=['force', 'target'])

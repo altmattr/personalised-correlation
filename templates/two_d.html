@@ -174,7 +174,7 @@ function show_vis(){
                 .attr("r", function(d){return d.freq*10})
                 .attr("fill", function(d){return response_to_shadeB(d.response)})
                 .on("click", function(node){console.log(d3.select(node));})
-  d3.selectAll("circle").append("svg:title").text(function(d){return `${d.name}, avg: ${d.freq}, resp: ${d.response}`})
+  d3.selectAll("circle").append("svg:title").text(function(d){return `${d.text}, avg: ${d.freq}, resp: ${d.response}`})
 
   //fetch links data 
   var links_data = d3.csvParse(link_frame);
