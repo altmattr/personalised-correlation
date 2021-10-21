@@ -130,6 +130,8 @@ function response_to_shadeA(resp){
 }
 
 function response_to_shadeB(resp){
+  if (resp === "")
+    return "rgba(255,255,255,0.05"
   if (resp <= 1)
     return "rgb(255,255,255)"
   if (resp <= 2)
