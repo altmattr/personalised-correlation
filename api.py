@@ -23,8 +23,6 @@ def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
     regex = data.loc[data["survey"] == surveyId]["regex"].values[0].strip()
 
     # Setting static parameters
-    requestCheckProgress = 0
-    progressStatus = "in progress"
     baseUrl = "https://{0}.qualtrics.com/API/v3/responseexports/".format(data_center)
     headers = {
         "content-type": "application/json",
@@ -42,7 +40,9 @@ def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
     print(progressId, flush=True);
 
     # Step 2: Checking on Data Export Progress and waiting until export is ready
-    while requestCheckProgress < 100 and progressStatus != "complete":
+    requestCheckProgress = 0
+    progressStatus = "in progress"
+    while requestCheckProgress < 100 or progressStatus != "complete":
         print("waiting for response", flush=True)
         requestCheckUrl = baseUrl + progressId
         print(requestCheckUrl, flush=True)
@@ -50,7 +50,8 @@ def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
         print("response was", flush=True)
         print(requestCheckResponse.text, flush=True)
         requestCheckProgress = requestCheckResponse.json()["result"]["percentComplete"]
-        print("Download is " + str(requestCheckProgress) + " complete", flush=True)
+        progressStatus = requestCheckResponse.json()["result"]["status"]
+        print("Download is " + str(requestCheckProgress) + " complete "+str(progressStatus), flush=True)
 
     # Step 3: Downloading file
     requestDownloadUrl = baseUrl + progressId + '/file'

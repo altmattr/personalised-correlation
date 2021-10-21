@@ -80,8 +80,11 @@ var globals = {
 <p>max-strength<input id="max-strength" type="number" value="1" onchange="show_vis()"/>enable:<input id="strength-on" type="checkbox" onchange="show_vis()"/></p>
 <p>collision enable:<input id="collision-on" type="checkbox" onchange="show_vis()" checked="true"/></p>
 </div>
+<h1 style="font-size:36pt">Personalised visualisation of your responses</h1>
 <div style="display:flex">
-<div style="flex-grow:1000"><svg id="vis" viewBox="-2500 -2500 5000 5000"></svg></div>
+<div style="flex-grow:1000">
+  <svg id="vis" viewBox="-2500 -2500 5000 5000"></svg>
+  </div>
 <div style="flex-grow:1; width: 300px">
 <p>This image shows how <span class="emph">your responses</span> fit in with the patterns we've found for everyone who have completed the survey so far.</p>
 <p>Each circle represents an item in the survey.</p>
@@ -101,6 +104,9 @@ var simulation;
 var zoom = 2500;
 var x_left = 0;
 var x_right = 0;
+var symp_scale = 15;
+
+var resp_key = ["not answered", "not at all true (1)", "a little true (2)", "somewhat true (3)", "very true (4)", "pefectly true (5)"];
 
 function set_vis_size(elt){
   z = document.getElementById("zoom").value;
@@ -171,10 +177,10 @@ function show_vis(){
                 .data(nodes_data)
                 .enter()
                 .append("circle")
-                .attr("r", function(d){return d.freq*10})
+                .attr("r", function(d){return d.freq*symp_scale})
                 .attr("fill", function(d){return response_to_shadeB(d.response)})
                 .on("click", function(node){console.log(d3.select(node));})
-  d3.selectAll("circle").append("svg:title").text(function(d){return `${d.text}, avg: ${d.freq}, resp: ${d.response}`})
+  d3.selectAll("circle").append("svg:title").text(function(d){return `${d.text}, avg: ${parseFloat(d.freq).toFixed(1)}, resp: ${resp_key[parseInt(d.response)]}`})
 
   //fetch links data 
   var links_data = d3.csvParse(link_frame);
@@ -193,10 +199,9 @@ function show_vis(){
                       .strength(function(d) {return d.normalisedforce})
   simulation.force("link",link_force)
 
-  simulation.force("collision", d3.forceCollide().radius(function(d){return d.freq*10}))
+  simulation.force("collision", d3.forceCollide().radius(function(d){return d.freq*symp_scale}))
 
   function tickActions() {
-    console.log("tick");
     nodes.attr("cx", function(d) { return d.x; })
         .attr("cy", function(d) { return d.y; });
     // links.attr("x1", function(d) { return d.source.x; })

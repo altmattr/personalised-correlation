@@ -65,7 +65,7 @@ def main(data, response_id):
 
   # for each node, work out it's frequency of response > 1
   for i, row in nodes.iterrows():
-    nodes.loc[i,'freq'] = data[i][lambda x: x > 1].dropna().mean() 
+    nodes.loc[i,'freq'] = data[i][lambda x: x >= 1].dropna().mean() 
 
 
   # for each node, get this participants response
