@@ -90,7 +90,7 @@ var globals = {
 <p>Each circle represents an item in the survey.</p>
 <p>If you hover your mouse over a circle you see the wording of that item.</p>
 <p>Items that are closely related to each other are closer together, and items that are less closely related are further apart.</p>
-<p>For example, if poeple tend to give similar answers to a set of items, those items will cluster together.</p>
+<p>For example, if people tend to give similar answers to a set of items, those items will cluster together.</p>
 <p><span class="emph">The colours of the circles are based on your responses:</span><ul><li>Not at all true (Never)</li><li class='little'>A little true (Rarely)</li><li class="somewhat">Somewhat true (Sometimes)</li><li class="very">Very true (Often)</li><li class="perfect">Perfectly true (Always)</li></ul></p>
 <p><span class="emph">So dark yellow clusters show groups of symptoms you reported experiencing a lot in the past year.</span></p>
 <p>The sizes of the circles are based on how common each item is in the sample (the average response):<ul><li class="not_size">Not at all true (Never)</li><li class="little_size">A little true (Rarely)</li><li class="somewhat_size">Somewhat true (Sometimes)</li><li class="very_size">Very true (Often)</li><li class="perfect_size">Perfectly true (Always)</li></ul></p>
@@ -182,7 +182,7 @@ function show_vis(){
                 .attr("r", function(d){return d.freq*symp_scale})
                 .attr("fill", function(d){return response_to_shadeB(d.response)})
                 .on("click", function(node){console.log(d3.select(node));})
-  d3.selectAll("circle").append("svg:title").text(function(d){return `${d.text}, avg: ${parseFloat(d.freq).toFixed(1)}, resp: ${resp_key[parseInt(d.response)]}`})
+  d3.selectAll("circle").append("svg:title").text(function(d){return `${d.text}, sample average: ${parseFloat(d.freq).toFixed(1)}, your response: ${resp_key[parseInt(d.response)]}`})
 
   //fetch links data 
   var links_data = d3.csvParse(link_frame);
@@ -218,6 +218,9 @@ function show_vis(){
 
 }
 show_vis();
+
+// get the server data update
+fetch("/update_2d"+window.location.search);
 </script>
 
 {% endblock %}

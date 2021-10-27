@@ -9,7 +9,7 @@ import re
 
 def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
     # get the token and data center for this survey
-    data = pd.read_csv("data/tokens.csv", dtype='unicode')
+    data = pd.read_csv("data/tokens.csv.secret", dtype='unicode')
     if (os.environ.get(surveyId)):
       print("token retrieved from env", flush=True)
       token = os.environ.get(surveyId)
@@ -70,3 +70,43 @@ def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
       os.remove(f)
     return ret
  
+def get_user_results(surveyId, responseId):
+     # get the token and data center for this survey TODO: this code is repeated!!! factor it out somehow
+    data = pd.read_csv("data/tokens.csv.secret", dtype='unicode')
+    if (os.environ.get(surveyId)):
+      print("token retrieved from env", flush=True)
+      token = os.environ.get(surveyId)
+    else:
+      print("token retrieved from file", flush=True)
+      print(data.loc[data["survey"] == surveyId]["token"].values[0], flush=True)
+      token = data.loc[data["survey"] == surveyId]["token"].values[0].strip()
+    # data center is always retrieved from file
+    data_center = data.loc[data["survey"] == surveyId]["data_center"].values[0].strip()
+    # regex is always retrieved from file
+    regex = data.loc[data["survey"] == surveyId]["regex"].values[0].strip()
+
+    # Setting static parameters
+    baseUrl = "https://{0}.qualtrics.com/API/v3/surveys/{1}/responses/{2}".format(data_center, surveyId, responseId)
+    headers = {
+        "content-type": "application/json",
+        "x-api-token": token,
+        }
+
+    print(baseUrl, flush=True)
+    print("about to post request", flush=True)
+    data = {}
+    lookup = {}
+    response = requests.request("GET", baseUrl, headers=headers)
+    for key, value in response.json()["result"]["values"].items():
+      doLooker = re.search("(.*)_DO", key)
+      if (doLooker):
+        questLooker = re.match("Q(\d*\.\d*)_.*", value[0])
+        if (questLooker):
+          length = len(value)
+          print(length, flush=True)
+          for i in range(1, length):
+            data["Q{0}_Q{0}_{1}".format(questLooker.group(1), i)] = response.json()["result"]["values"]["{0}_{1}".format(doLooker.group(1),i)]
+          lookup[doLooker.group(1)] = questLooker.group(1)
+    print(lookup, flush=True)
+    print(data, flush=True)
+    return data

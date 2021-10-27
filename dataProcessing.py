@@ -68,12 +68,12 @@ def main(data, response_id):
     nodes.loc[i,'freq'] = data[i][lambda x: x >= 1].dropna().mean() 
 
 
-  # for each node, get this participants response
-  for i, row in nodes.iterrows():
-    try: # if we don't have that response_id, just give 0
-      nodes.loc[i,'response'] = data.loc[response_id, i]
-    except KeyError:
-      nodes.loc[i, 'response'] = 0
+  # for each node, get this participants response : TODO: now done in a separate call.
+  # for i, row in nodes.iterrows():
+  #   try: # if we don't have that response_id, just give 0
+  #     nodes.loc[i,'response'] = data.loc[response_id, i]
+  #   except KeyError:
+  #     nodes.loc[i, 'response'] = 0
 
   #for each node, add the question text
   print(data.iloc[0], flush=True)
@@ -105,7 +105,7 @@ def fake_nodes_from_correlation_matrix(data_corr):
 
 def correleation_matrix_to_nodes_and_forces(data_corr):
 
-  threshold = 0.55
+  threshold = 0.6
 
   # From the correlation matrix, create a frame in the form that d3 would prefer for forces
   force_frame = pd.DataFrame(columns=['force', 'target'])
