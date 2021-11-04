@@ -80,7 +80,7 @@ var globals = {
 <p>max-strength<input id="max-strength" type="number" value="1" onchange="show_vis()"/>enable:<input id="strength-on" type="checkbox" onchange="show_vis()"/></p>
 <p>collision enable:<input id="collision-on" type="checkbox" onchange="show_vis()" checked="true"/></p>
 </div>
-<h1 style="font-size:36pt">Personalised visualisation of your responses</h1>
+<h1 style="font-size:36pt">Personalised visualisation of <span class="emph">your responses</span></h1>
 <div style="display:flex">
 <div style="flex-grow:1000">
   <svg id="vis" viewBox="-2500 -2500 5000 5000"></svg>
@@ -130,8 +130,8 @@ function response_to_shadeA(resp){
 }
 
 function response_to_shadeB(resp){
-  if (resp === "")
-    return "rgba(255,255,255,0.15"
+  if (resp <= 0)
+    return "rgba(255,255,255,0.15)"
   if (resp <= 1)
     return "rgb(255,255,255)"
   if (resp <= 2)
