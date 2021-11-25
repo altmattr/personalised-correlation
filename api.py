@@ -9,7 +9,7 @@ import re
 
 def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
     # get the token and data center for this survey
-    data = pd.read_csv("data/tokens.csv.secret", dtype='unicode')
+    data = pd.read_csv("data/tokens.csv", dtype='unicode')
     if (os.environ.get(surveyId)):
       print("token retrieved from env", flush=True)
       token = os.environ.get(surveyId)
@@ -72,7 +72,7 @@ def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
  
 def get_user_results(surveyId, responseId):
      # get the token and data center for this survey TODO: this code is repeated!!! factor it out somehow TODO: for real, this duplication already cost you 30 mins - fix it!
-    data = pd.read_csv("data/tokens.csv.secret", dtype='unicode')
+    data = pd.read_csv("data/tokens.csv", dtype='unicode')
     if (os.environ.get(surveyId)):
       print("token retrieved from env", flush=True)
       token = os.environ.get(surveyId)
