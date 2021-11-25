@@ -4,29 +4,8 @@ from random import randrange
 import pandas as pd
 import re
 
-def main(data, response_id):
+def main(data):
   print('begun main processing', flush=True)
-
-  # find response_id regardless of string format
-  pattern = re.compile('(?i)response ?_?id') # case insensitive, 'responseid', with '_',' ' or '' separating the words.
-  for col in data.columns:
-    match = re.search(pattern,col)
-    if match:
-      response_id_colname = match.group(0)
-      break
-
-  data.set_index(response_id_colname, inplace=True)
-
-  # lets see what indexes we have
-  # print(data.index.tolist(), flush=True)
-
-
-  print(response_id_colname, 'column found.', flush=True)
-
-  # question_df = data.iloc[0]
-
-  # drop first 2 rows to remove irrelevant data
-  # data = data.iloc[2:]
 
   # keep question columns
   # TODO: not needed anymore
@@ -67,16 +46,7 @@ def main(data, response_id):
   for i, row in nodes.iterrows():
     nodes.loc[i,'freq'] = data[i][lambda x: x >= 1].dropna().mean() 
 
-
-  # for each node, get this participants response : TODO: now done in a separate call.
-  # for i, row in nodes.iterrows():
-  #   try: # if we don't have that response_id, just give 0
-  #     nodes.loc[i,'response'] = data.loc[response_id, i]
-  #   except KeyError:
-  #     nodes.loc[i, 'response'] = 0
-
   #for each node, add the question text
-  print(data.iloc[0], flush=True)
   for i, row in nodes.iterrows():
     nodes.loc[i,'text'] = questions.loc[i].removeprefix("Now we ask you to respond to a number of statements about your thoughts, feelings, experiences, a...-")
 

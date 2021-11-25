@@ -45,17 +45,13 @@ def two_d_vis():
 @app.route('/update_2d')
 def update_data():
     survey_id   = request.args.get('surveyId',    default="SV_2i51uu8Vidq2zC5")
-    response_id = request.args.get('response_id', default="")
-    print(response_id, flush=True)
-
-    get_user_results(survey_id, response_id)
 
     # get correlation matrix data
     data = get_all_results(surveyId=survey_id, fileFormat="csv")
     print("results got")
 
     # generate individual's symptom data and the group averages
-    (nodes, links) = dataProcessing.main(data, response_id)
+    (nodes, links) = dataProcessing.main(data)
 
     return render_template("two_d.html", nodes=nodes.to_csv(), links=links.to_csv())
 
@@ -69,7 +65,7 @@ def two_d_demo():
 if __name__ == '__main__':
     # warm up the data
     get_all_results(surveyId='SV_6xtvNTckiy9wSi2')
-    
+
     port = os.environ.get("PORT")
     if (port == None):
         port = 5000

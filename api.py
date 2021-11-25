@@ -110,6 +110,3 @@ def get_user_results(surveyId, responseId):
     print(lookup, flush=True)
     print(data, flush=True)
     return data
-
-if __name__ == '__main__':
-    get_all_results(surveyId='SV_6xtvNTckiy9wSi2')
