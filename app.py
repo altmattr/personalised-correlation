@@ -43,8 +43,11 @@ def two_d_vis():
     return render_template("two_d.html", nodes=nodes.to_csv(), links=links.to_csv())
 
 @app.route('/update_2d')
-def update_data():
-    survey_id   = request.args.get('surveyId',    default="SV_2i51uu8Vidq2zC5")
+def update_data(survey_id=""):
+    # survey id is set if we are warming up, then no request or response possible.
+    
+    if (survey_id == ""):
+      survey_id   = request.args.get('surveyId',    default="SV_2i51uu8Vidq2zC5")
 
     # get correlation matrix data
     data = get_all_results(surveyId=survey_id, fileFormat="csv")
@@ -52,8 +55,11 @@ def update_data():
 
     # generate individual's symptom data and the group averages
     (nodes, links) = dataProcessing.main(data)
-
-    return render_template("two_d.html", nodes=nodes.to_csv(), links=links.to_csv())
+    
+    if (survey_id == ""):
+      return render_template("two_d.html", nodes=nodes.to_csv(), links=links.to_csv())
+    else:
+      return None
 
 @app.route('/demo_2d')
 def two_d_demo():
@@ -64,7 +70,7 @@ def two_d_demo():
 
 if __name__ == '__main__':
     # warm up the data
-    get_all_results(surveyId='SV_6xtvNTckiy9wSi2')
+    update_data(survey_id='SV_6xtvNTckiy9wSi2')
 
     port = os.environ.get("PORT")
     if (port == None):
