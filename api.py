@@ -112,4 +112,4 @@ def get_user_results(surveyId, responseId):
     return data
 
 if __name__ == '__main__':
-    get_all_results(surveyId="SV_6xtvNTckiy9wSi2")
+    get_all_results(surveyId='SV_6xtvNTckiy9wSi2')
