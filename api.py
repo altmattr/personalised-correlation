@@ -9,7 +9,7 @@ import re
 
 def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
     # get the token and data center for this survey
-    data = pd.read_csv("data/tokens.csv", dtype='unicode')
+    data = pd.read_csv("data/tokens.csv.secret", dtype='unicode')
     if (os.environ.get(surveyId)):
       print("token retrieved from env", flush=True)
       token = os.environ.get(surveyId)
@@ -37,7 +37,7 @@ def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
     print("about to post request", flush=True)
     downloadRequestResponse = requests.request("POST", downloadRequestUrl, data=downloadRequestPayload, headers=headers)
     progressId = downloadRequestResponse.json()["result"]["id"]
-    print(progressId, flush=True);
+    print(progressId, flush=True)
 
     # Step 2: Checking on Data Export Progress and waiting until export is ready
     requestCheckProgress = 0
@@ -72,7 +72,7 @@ def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
  
 def get_user_results(surveyId, responseId):
      # get the token and data center for this survey TODO: this code is repeated!!! factor it out somehow TODO: for real, this duplication already cost you 30 mins - fix it!
-    data = pd.read_csv("data/tokens.csv", dtype='unicode')
+    data = pd.read_csv("data/tokens.csv.secret", dtype='unicode')
     if (os.environ.get(surveyId)):
       print("token retrieved from env", flush=True)
       token = os.environ.get(surveyId)
@@ -110,3 +110,6 @@ def get_user_results(surveyId, responseId):
     print(lookup, flush=True)
     print(data, flush=True)
     return data
+
+if __name__ == '__main__':
+    get_all_results(surveyId="SV_6xtvNTckiy9wSi2")

@@ -9,4 +9,6 @@ RUN pip install requests
 
 COPY . .
 
+RUN python api.py
+
 CMD ["python", "app.py"]
