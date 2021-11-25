@@ -67,6 +67,9 @@ def two_d_demo():
   return render_template("two_d.html", nodes=nodes.to_csv(), links=links.to_csv())
 
 if __name__ == '__main__':
+    # warm up the data
+    get_all_results(surveyId='SV_6xtvNTckiy9wSi2')
+    
     port = os.environ.get("PORT")
     if (port == None):
         port = 5000
