@@ -10,17 +10,23 @@ import re
 def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
     # get the token and data center for this survey
     data = pd.read_csv("data/tokens.csv", dtype='unicode')
-    if (os.environ.get(surveyId)):
+
+    # parent is always retrieved from file
+    parent = data.loc[data["survey"] == surveyId]["parent"].values[0].strip()
+    # and parent is used for the token
+
+    if (os.environ.get(parent)):
       print("token retrieved from env", flush=True)
-      token = os.environ.get(surveyId)
+      token = os.environ.get(parent)
     else:
       print("token retrieved from file", flush=True)
-      print(data.loc[data["survey"] == surveyId]["token"].values[0], flush=True)
-      token = data.loc[data["survey"] == surveyId]["token"].values[0].strip()
+      print(data.loc[data["survey"] == parent]["token"].values[0], flush=True)
+      token = data.loc[data["survey"] == parent]["token"].values[0].strip()
     # data center is always retrieved from file
-    data_center = data.loc[data["survey"] == surveyId]["data_center"].values[0].strip()
-    # regex is always retrieved from file
+    data_center = data.loc[data["survey"] == parent]["data_center"].values[0].strip()
+    # regex is always retrieved from file and we use this surveyId for that
     regex = data.loc[data["survey"] == surveyId]["regex"].values[0].strip()
+
 
     # Setting static parameters
     baseUrl = "https://{0}.qualtrics.com/API/v3/responseexports/".format(data_center)
@@ -33,7 +39,7 @@ def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
     print(headers, flush=True)
     # Step 1: Creating Data Export
     downloadRequestUrl = baseUrl
-    downloadRequestPayload = '{"format":"' + fileFormat + '","surveyId":"' + surveyId + '"}'
+    downloadRequestPayload = '{"format":"' + fileFormat + '","surveyId":"' + parent + '"}'
     print("about to post request", flush=True)
     downloadRequestResponse = requests.request("POST", downloadRequestUrl, data=downloadRequestPayload, headers=headers)
     progressId = downloadRequestResponse.json()["result"]["id"]
