@@ -5,7 +5,7 @@ import os.path
 import os
 import dataProcessing
 import pandas as pd
-from api import get_all_results, get_user_results
+from api import get_all_results, get_user_results, get_tokens
 
 app = Flask(__name__) 
 
@@ -27,11 +27,13 @@ def two_d_vis():
 
     survey_id   = request.args.get('surveyId',    default="SV_2i51uu8Vidq2zC5")
     response_id = request.args.get('response_id', default="")
+    response_t1 = request.args.get('responseT1', default=None)
     print(response_id, flush=True)
 
     user_results = get_user_results(survey_id, response_id)
     nodes = pd.read_csv('static/data/nodes.csv')
     links = pd.read_csv('static/data/forces.csv')
+    (token, data_center, regex, parent) = get_tokens(survey_id)
 
     for i, row in nodes.iterrows():
       print(nodes.loc[i,"name"], flush=True)
@@ -40,7 +42,7 @@ def two_d_vis():
       except KeyError:
         nodes.loc[i, 'response'] = 0
 
-    return render_template("two_d.html", nodes=nodes.to_csv(), links=links.to_csv())
+    return render_template("two_d.html", nodes=nodes.to_csv(), links=links.to_csv(), response_t1=response_t1, parent=parent)
 
 @app.route('/update_2d')
 def update_data(survey_id=""):

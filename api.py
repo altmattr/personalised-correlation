@@ -75,9 +75,27 @@ def get_all_results(surveyId='SV_2i51uu8Vidq2zC5', fileFormat='csv'):
     for f in globpatt:
       os.remove(f)
     return ret
+
+def get_tokens(surveyId):
+     # get the token and data center for this survey TODO: this code is repeated!!! factor it out somehow TODO: for real, this duplication already cost you 30 mins - fix it!
+    data = pd.read_csv("data/tokens.csv", dtype='unicode')
+    if (os.environ.get(surveyId)):
+      print("token retrieved from env", flush=True)
+      token = os.environ.get(surveyId)
+    else:
+      print("token retrieved from file", flush=True)
+      print(data.loc[data["survey"] == surveyId]["token"].values[0], flush=True)
+      token = data.loc[data["survey"] == surveyId]["token"].values[0].strip()
+    # data center is always retrieved from file
+    data_center = data.loc[data["survey"] == surveyId]["data_center"].values[0].strip()
+    # regex is always retrieved from file
+    regex = data.loc[data["survey"] == surveyId]["regex"].values[0].strip()
+    parent = data.loc[data["survey"] == surveyId]["parent"].values[0].strip()
+    return (token, data_center, regex, parent)
+
  
 def get_user_results(surveyId, responseId):
-     # get the token and data center for this survey TODO: this code is repeated!!! factor it out somehow TODO: for real, this duplication already cost you 30 mins - fix it!
+     # get the token and data center for this survey TODO: this code is repeated!!! factor it out somehow (see `get_tokens`) TODO: for real, this duplication already cost you 30 mins - fix it!
     data = pd.read_csv("data/tokens.csv", dtype='unicode')
     if (os.environ.get(surveyId)):
       print("token retrieved from env", flush=True)

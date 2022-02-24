@@ -92,9 +92,10 @@ var globals = {
 <p>Items that are closely related to each other are closer together, and items that are less closely related are further apart.</p>
 <p>For example, if people tend to give similar answers to a set of items, those items will cluster together.</p>
 <p><span class="emph">The colours of the circles are based on your responses:</span><ul><li>Not at all true (Never)</li><li class='little'>A little true (Rarely)</li><li class="somewhat">Somewhat true (Sometimes)</li><li class="very">Very true (Often)</li><li class="perfect">Perfectly true (Always)</li></ul></p>
-<p><span class="emph">So dark yellow clusters show groups of symptoms you reported experiencing a lot in the past year.</span> Questions not included in your survey are greyed out</p>
+<p><span class="emph">So dark yellow clusters show groups of symptoms you reported experiencing a lot in the past {%if response_t1 is defined%}month{%else%}year{%endif%}.</span> Questions not included in your survey are greyed out</p>
 <p>The sizes of the circles are based on how common each item is in the sample (the average response):<ul><li class="not_size">Not at all true (Never)</li><li class="little_size">A little true (Rarely)</li><li class="somewhat_size">Somewhat true (Sometimes)</li><li class="very_size">Very true (Often)</li><li class="perfect_size">Perfectly true (Always)</li></ul></p>
-<p>To learn more about how this figure was genereated, go to <a href=https://bit.ly/mentalillnessstudy>https://bit.ly/mentalillnessstudy</a></p>
+<p>To learn more about how this figure was genereated, go to <a href="https://bit.ly/mentalillnessstudy">https://bit.ly/mentalillnessstudy</a></p>
+{%if response_t1 is defined%}<p><a href="/data_2d?surveyId={{parent}}&response_id={{response_t1}}">See your original responses for comparison here</a></p>{%endif%}
 </div>
 </div>
 <script src="https://d3js.org/d3.v4.min.js"></script>
