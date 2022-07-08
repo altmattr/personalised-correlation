@@ -72,7 +72,7 @@ def two_d_demo():
 
 if __name__ == '__main__':
     # warm up the data
-    update_data(survey_id='SV_6xtvNTckiy9wSi2')
+    update_data(survey_id='SV_bj7IR4LM4DmAlme')
 
     port = os.environ.get("PORT")
     if (port == None):
