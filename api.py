@@ -129,7 +129,10 @@ def get_user_results(surveyId, responseId):
           length = len(value)
           print(length, flush=True)
           for i in range(1, length):
-            data["Q{0}_Q{0}_{1}".format(questLooker.group(1), i)] = response.json()["result"]["values"]["{0}_{1}".format(doLooker.group(1),i)]
+            try:
+              data["Q{0}_Q{0}_{1}".format(questLooker.group(1), i)] = response.json()["result"]["values"]["{0}_{1}".format(doLooker.group(1),i)]
+            except Exception:
+              pass
           lookup[doLooker.group(1)] = questLooker.group(1)
     print(lookup, flush=True)
     print(data, flush=True)
