@@ -125,12 +125,12 @@ def get_user_results(surveyId, responseId):
     for key, value in response.json()["result"]["values"].items():
       doLooker = re.search("(.*)_DO", key)
       if (doLooker):
-        questLooker = re.match("Q(\d*\.\d*)_.*", value[0])
+        questLooker = re.match(r"Q(\d*\.\d*)_.*", value[0])
         if (questLooker):
           length = len(value)  # at this point value is a list of questions
           # print(length, flush=True)
           for i in value:
-            thisIndex = re.match("Q\d*\.\d*_(\d*)", i).group(1)
+            thisIndex = re.match(r"Q\d*\.\d*_(\d*)", i).group(1)
             try:
               data["Q{0}_Q{0}_{1}".format(questLooker.group(1), thisIndex)] = response.json()["result"]["values"]["{0}_{1}".format(doLooker.group(1),thisIndex)]
             except Exception:
