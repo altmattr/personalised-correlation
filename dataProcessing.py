@@ -14,10 +14,10 @@ def main(data):
 
 
   # drop columns if 90% of it's values are null
-  drop_cols = [col for col, val in data.isnull().sum().iteritems() if val > int(data.shape[0]*0.9)]
+  drop_cols = [col for col, val in data.isnull().sum().items() if val > int(data.shape[0]*0.9)]
   data.drop(drop_cols, axis=1,inplace=True)
 
-  # filter the quesiton string row
+  # filter the question string row
   # question_df = question_df[keep_cols].drop(drop_cols)
 
   # grab the questions before we wipe them out with the numeric coersion
@@ -86,7 +86,7 @@ def correleation_matrix_to_nodes_and_forces(data_corr):
     df = c.to_frame(name="force")
     df["target"] = col
     df = df.drop(processed) # this prevents doubling up
-    force_frame = force_frame.append(df)
+    force_frame = pd.concat([force_frame, df])
   force_frame.index.name = "source"
   # filter all negative
   force_frame = force_frame[(force_frame["force"] > 0)].dropna()

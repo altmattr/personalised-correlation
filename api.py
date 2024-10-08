@@ -121,19 +121,21 @@ def get_user_results(surveyId, responseId):
     data = {}
     lookup = {}
     response = requests.request("GET", baseUrl, headers=headers)
+    print(response.json(), file = open("static/data/raw_data_last_responseid.json", "w"))
     for key, value in response.json()["result"]["values"].items():
       doLooker = re.search("(.*)_DO", key)
       if (doLooker):
         questLooker = re.match("Q(\d*\.\d*)_.*", value[0])
         if (questLooker):
-          length = len(value)
-          print(length, flush=True)
-          for i in range(1, length):
+          length = len(value)  # at this point value is a list of questions
+          # print(length, flush=True)
+          for i in value:
+            thisIndex = re.match("Q\d*\.\d*_(\d*)", i).group(1)
             try:
-              data["Q{0}_Q{0}_{1}".format(questLooker.group(1), i)] = response.json()["result"]["values"]["{0}_{1}".format(doLooker.group(1),i)]
+              data["Q{0}_Q{0}_{1}".format(questLooker.group(1), thisIndex)] = response.json()["result"]["values"]["{0}_{1}".format(doLooker.group(1),thisIndex)]
             except Exception:
               pass
           lookup[doLooker.group(1)] = questLooker.group(1)
-    print(lookup, flush=True)
-    print(data, flush=True)
+    print("---lookup---\n", lookup, flush=True)
+    print("--- data ---\n", data, flush=True)
     return data

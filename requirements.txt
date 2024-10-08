@@ -1,0 +1,6 @@
+# not used, only required by heroku.  Docker container does the hard work
+
+flask
+numpy
+requests
+pandas
