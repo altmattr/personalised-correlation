@@ -9,6 +9,11 @@ from api import get_all_results, get_user_results, get_tokens
 
 app = Flask(__name__) 
 
+def get_app():
+  update_data(survey_id='SV_afU6gQKDFQIlI9M', ret=False)
+  return app
+
+
 @app.route('/')
 def index():
     return render_template("spiel.html")
