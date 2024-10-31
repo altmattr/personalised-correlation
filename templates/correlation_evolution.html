@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+
+ body, svg{
+   background-color: rgb(11,23,46);
+   color: white;
+ }
+
+.emph {
+  color: rgb(254,191,45)
+}
+
+a {
+  color: rgb(240,240,240);
+}
+
+.links line {
+  stroke: #999;
+}
+
+circle {
+  stroke: #fff;
+  stroke-width: 0px;
+}
+
+li {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='-1 -1 2 2'><circle fill='white' r='1' /></svg>");
+}
+li.little {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='-1 -1 2 2'><circle fill='rgb(244,232,198)' r='1' /></svg>");
+}
+li.somewhat {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='-1 -1 2 2'><circle fill='rgb(254,229,158)' r='1' /></svg>");
+}
+li.very {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='-1 -1 2 2'><circle fill='rgb(254,216,110)' r='1' /></svg>");
+}
+li.perfect {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='-1 -1 2 2'><circle fill='rgb(254,191,45)' r='1' /></svg>");
+}
+li.not_size {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='5' height='5' viewBox='-1 -1 2 2'><circle fill='white' r='1' /></svg>");
+}
+li.little_size {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='-1 -1 2 2'><circle fill='white' r='1' /></svg>");
+}
+li.somewhat_size {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='-1 -1 2 2'><circle fill='white' r='1' /></svg>");
+}
+li.very_size {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='-1 -1 2 2'><circle fill='white' r='1' /></svg>");
+}
+li.perfect_size {
+  list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='25' height='25' viewBox='-1 -1 2 2'><circle fill='white' r='1' /></svg>");
+}
+li span {
+  margin-left: -10px;
+  padding-right: 5px;
+  font-size: 3em;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<script>
+var node_frame = {{nodes[0] | tojson }};
+var link_frame = {{links[0] | tojson }};
+var globals = {
+  node_size: 5,
+  links_data: null
+}</script>
+<div style="display:none">
+<p>zoom<input id = "zoom" type="range" min="1200" max="5000" oninput="set_vis_size(this)"/></p>
+<p>left-right<input id = "left-right" type="range" min="-10000" max="10000" oninput="set_vis_size(this)"/></p>
+<p>up-down<input id = "up-down" type="range" min="-10000" max="10000" oninput="set_vis_size(this)"/></p>
+<p>max-dist<input id="max-dist" type="number" value="20" onchange="show_vis()"/>enable:<input id="dist-on" type="checkbox" onchange="console.log('huh');show_vis()"/></p>
+<p>max-strength<input id="max-strength" type="number" value="1" onchange="show_vis()"/>enable:<input id="strength-on" type="checkbox" onchange="show_vis()"/></p>
+<p>collision enable:<input id="collision-on" type="checkbox" onchange="show_vis()" checked="true"/></p>
+</div>
+<div style="display:flex">
+  <div style="flex-grow:1000">
+    <svg id="vis" viewBox="-2200 -2200 4400 4400"></svg>
+  </div>
+</div>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+var simulation;
+var zoom = 2500;
+var x_left = 0;
+var x_right = 0;
+var symp_scale = 8;
+
+function set_vis_size(elt){
+  z = document.getElementById("zoom").value;
+  x = document.getElementById("left-right").value;
+  y = document.getElementById("up-down").value;
+  document.querySelector('svg').setAttribute("viewBox",  `${x} ${y} ${z} ${z}`);
+}
+
+function show_vis(){
+
+  //create somewhere to put the force directed graph
+  var svg = d3.select("svg"),
+      width = +svg.attr("width"),
+      height = +svg.attr("height");
+
+  // sync the zoom with the slider
+  // set_vis_size(document.getElementById("zoom"));
+
+  // clear any existing content
+  svg.selectAll("*").remove();
+  
+  var nodes_data = d3.csvParse(node_frame);
+
+  //set up the simulation 
+  //nodes only for now 
+  simulation = d3.forceSimulation()
+            //add nodes
+            .nodes(nodes_data);	
+      
+  //add forces
+  //we're going to add a charge to each node 
+  //also going to add a centering force
+  simulation
+      .force("charge_force", d3.forceManyBody())
+      .force("center_force", d3.forceCenter(width / 2, height / 2));
+
+  //draw circles for the nodes 
+  var nodes = svg.append("g")
+                .attr("class", "nodes")
+                .selectAll("circle")
+                .data(nodes_data)
+                .enter()
+                .append("circle")
+                .attr("r", function(d){return d.freq*symp_scale})
+                .attr("fill", function(d){return "rgba(255,255,255,0.15)"})
+                .on("click", function(node){console.log(d3.select(node));})
+  d3.selectAll("circle").append("svg:title").text(function(d){return `${d.text}, sample average: ${parseFloat(d.freq).toFixed(1)}`})
+
+  //fetch links data 
+  var links_data = d3.csvParse(link_frame);
+  //draw lines for the links 
+  // var links = svg.append("g")
+  //                .attr("class", "links")
+  //                .selectAll("line")
+  //                .data(links_data)
+  //                .enter()
+  //                .append("line")
+  //                .attr("stroke", "black")
+  //                .attr("stroke-width", function(d){return 1;});        
+
+  var link_force =  d3.forceLink(links_data)
+                      .id(function(d) { return d.name; })
+                      .strength(function(d) {return d.normalisedforce})
+  simulation.force("link",link_force)
+
+  simulation.force("collision", d3.forceCollide().radius(function(d){return d.freq*symp_scale}))
+
+  function tickActions() {
+    nodes.attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; });
+    // links.attr("x1", function(d) { return d.source.x; })
+    //      .attr("y1", function(d) { return d.source.y; })
+    //      .attr("x2", function(d) { return d.target.x; })
+    //      .attr("y2", function(d) { return d.target.y; });
+
+  }
+
+  //add tick instructions: 
+  simulation.on("tick", tickActions );
+
+}
+show_vis();
+
+</script>
+
+{% endblock %}

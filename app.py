@@ -6,6 +6,10 @@ import os
 import dataProcessing
 import pandas as pd
 from api import get_all_results, get_user_results, get_tokens
+import shutil
+import datetime
+import glob
+
 
 app = Flask(__name__) 
 
@@ -49,12 +53,22 @@ def two_d_vis():
     nodes.to_csv('static/data/nodes_last_responseid.csv') # for debugging help
     return render_template("two_d.html", nodes=nodes.to_csv(), links=links.to_csv(), response_t1=response_t1, parent=parent)
 
+@app.route("/corr_2d")
+def corr_vis():
+    all_nodes = [pd.read_csv(f).to_csv() for f in glob.glob("static/data/nodes_*.csv")]
+    all_forces = [pd.read_csv(f).to_csv() for f in glob.glob("static/data/forces_*.csv")]
+    return render_template("correlation_evolution.html", nodes=all_nodes, links=all_forces)
+
 @app.route('/update_2d')
 def update_data(survey_id="", ret = True):
     # survey id is set if we are warming up, then no request or response possible.
     
     if (survey_id == ""):
       survey_id   = request.args.get('surveyId',    default="SV_afU6gQKDFQIlI9M")
+
+    # store old results
+    shutil.copyfile("static/data/forces.csv", f"static/data/forces_{datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}.csv")
+    shutil.copyfile("static/data/nodes.csv", f"static/data/nodes_{datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}.csv")
 
     # get correlation matrix data
     data = get_all_results(surveyId=survey_id, fileFormat="csv")
